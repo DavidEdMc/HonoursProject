@@ -14,8 +14,10 @@ The application is expected to follow the below design structure
 **Presentation Layer**
 - View(s)
 - Controller(s)
+
 **Application Layer**
 - Service(s)
+
 **Data Layer**
 - Model(s)
 - Database(s)
