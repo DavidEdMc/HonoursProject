@@ -1,13 +1,12 @@
-# HonoursProject
+# Author: David Edward McIntyre
+# Project: HonoursProject
 The following project is part of my **2026 Honours Project** for the **BSC (HONS) SOFTWARE DEVELOPMENT (GRADUATE APPRENTICESHIP)** programme at **Edinburgh Napier University**.
 
 # Project Abstract
-This project investigates whether gamified digital learning environments can enhance student engagement and improve retention of a subject matter compared with traditional instructional materials. Gamification has become increasingly prominent in many areas of technology and education, however existing research presents mixed findings, with many studies reporting short-term motivational benefits but limited evidence of sustained engagement or long-term learning gains. To address these gaps this study develops a prototype web-based application that incorporates selected game mechanics and compares its effectiveness with a non-gamified control condition using standard documentation or presentation materials. Two participant groups of equal size will engage with either the gamified or non-gamified version of the learning material and complete periodic assessments and quizzes designed to measure both engagement and retention of the subject materials over time. 
-
-By combining a purpose-built digital application with repeated testing, this study aims to provide clearer insight into whether gamification meaningfully supports student engagement and improved retention in educational contexts.
+This project evaluates whether a gamified web-based learning environment improves student engagement and information retention compared with traditional materials. It implements a prototype application that uses selected game mechanics and compares outcomes from two matched participant groups (gamified vs. non-gamified) through periodic assessments. The repository contains the prototype source and architecture documentation.
 
 # Application Overview
-The application contained within this REPO uses a **Three-Tiered Architecture** with a **Model-View-Controler (MVC)** pattern and implementing single purpose **Services** on the **Application Layer**. 
+The application contained within this REPO uses a **Three-Tiered Architecture** with a **Model-View-Controller (MVC)** pattern and implementing single purpose **Services** on the **Application Layer**. 
 
 The application is expected to follow the below design structure
 
@@ -52,26 +51,26 @@ The **Data Layer** consists of the following component(s):
 
 **Model** components contain the definitions of the data structure that the application uses, containing the connections for what data that the application has access to from the **Database** components. The model components are the core of the application and define the data that can be accessed and processed.
 
-**Database** components store data used by the application in structured tables that can be accessd via the **Services** and **Model** components in order to pass and manipulate data to the other components of the application.
+**Database** components store data used by the application in structured tables that can be accessed via the **Services** and **Model** components in order to pass and manipulate data to the other components of the application.
 
 ## Design Drawbacks
 The implemented design does pose potential drawbacks including; the separation of concerns can lead to tight coupling between **Controllers** with both **Views** and **Services** creating the potential for changes cascading across components if design is not well implemented.
 
-Another drawback is the potenial of **Controllers** becoming inflated and unmanageable if they are designed to handle multiple responsibilities, violating the **SRP** software principle. The inclusion of **Services** in the design helps to mitigate this risk by limiting the resonsibilities of the controller to calling appropriate services and assigning each service a single responsibility.
+Another drawback is the potential of **Controllers** becoming inflated and unmanageable if they are designed to handle multiple responsibilities, violating the **SRP** software principle. The inclusion of **Services** in the design helps to mitigate this risk by limiting the responsibilities of the controller to calling appropriate services and assigning each service a single responsibility.
 
-This architectural design requires a well thought out designa nd implementation to mitigate risks and avoid potential issues, placing a strong focus on the design and planning of the system to ensure correct data and functionality are captured as expected for the intended application purposes.
+This architectural design requires a well thought out design and implementation to mitigate risks and avoid potential issues, placing a strong focus on the design and planning of the system to ensure correct data and functionality are captured as expected for the intended application purposes.
 
 ## Design Justification
 
 The key aspect of this architecture is the focus on *Separation of Concerns* and the use of key components. The high level diagram provided within this REPO (Assets/Architecture_Flow_Diagram.png) visually demonstrates the design and flow.
 
-By separating the core functionality and interactive systems of the applciation across multiple components we increase scalability and maintainability of the application as well as allowing for modularity and customisation of each individual component. Through this we also reserve a separation of concerns between components which is the key advantage of the chosen architecture and parttern. This provides each component a clearly defined role and allows for them to be designed for their specific intended uses rather than being responsible for multiple purposes or business logic and creating tight coupling. This seperation also allows for easier testability of each component as they may be tested independently to be performing their individual tasks and purposes. Additionally, the reusability of components such as **Controllers** and **Services** allow for components to be utilised by other components in the application, such as **Views** and **Controllers** respectively, without creating duplicate components that would violate the **DRY** principle of software design.
+By separating the core functionality and interactive systems of the application across multiple components we increase scalability and maintainability of the application as well as allowing for modularity and customisation of each individual component. Through this we also reserve a separation of concerns between components which is the key advantage of the chosen architecture and pattern. This provides each component a clearly defined role and allows for them to be designed for their specific intended uses rather than being responsible for multiple purposes or business logic and creating tight coupling. This separation also allows for easier testability of each component as they may be tested independently to be performing their individual tasks and purposes. Additionally, the reusability of components such as **Controllers** and **Services** allow for components to be utilised by other components in the application, such as **Views** and **Controllers** respectively, without creating duplicate components that would violate the **DRY** principle of software design.
 
 The **Service** components within this design are introduced to create an extra layer of separation of concerns. This additional component allows for the **Controller** components to remain focused on handling requests and routing and for **Model** components to remain focused on data definition and persistence and allowing the **Service** components contain the business logic. This separation reduces coupling between **Controller** and **Model** components and adheres to the **Single Responsibility Principle (SRP)** in turn helping to improve maintainability, testability and scalability of the application. 
 
 This architectural design is popular for web based applications due to the structure of components allowing for a clear defined separation of concerns and responsibilities.
 
-## Languages and Strucutre
+## Languages and Structure
 This design utilises organized directories that reflect the layered design. The core file structure of the application will include directories for **Views** for presentation, **Controllers** and **Services** for request handling and business logic, **Models** for persistence definitions, and a **Data** directory for infrastructure components such as the **Database** connections. 
 
 This design will also utilise the following key languages: 
@@ -82,8 +81,9 @@ This design will also utilise the following key languages:
 
 The application will also utilise **MySQL** for data storage using SQL queries executed through repository components in the **Data layer**, which are invoked by **Services**. Connection strings are defined in an *appsettings.json* configuration file, which uses JSON format to manage database access and application settings within the Data directory. This structure continues to enforce the separation of concerns.  
 
-The diagram below provides an initial visual representation of the proposed file structure using the expected file type extensions and examples of files that may exist in each directory. 
+The diagram below provides an initial visual representation of the proposed file structure using the expected file type extensions and examples of files that may exist in each directory.
 
+```text
 Project Root
 |-- Assets
 |  |--Application_Assets
@@ -112,3 +112,4 @@ Project Root
 |  |-- styles.css
 |
 |-- appsettings.json
+```
