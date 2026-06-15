@@ -1,8 +1,24 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
+<div class="hero-container">
+    <div class="hero-mascot">
+        <!-- Placeholder for duck mascot image -->
+        <img src="~/assets/images/duck-minimalist.png" alt="Mascot Duck" />
+    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="hero-content">
+        <h1 class="hero-title">Welcome back!</h1>
+        <p class="hero-subtitle">Ready to learn something new today?</p>
+
+        <a class="hero-button" asp-controller="Lessons" asp-action="Index">
+            Choose a Lesson
+        </a>
+    </div>
 </div>
+
+<section class="main-wrapper text-center">
+    <h1 class="main-header">Honours Project</h1>
+    <p class="lead">Welcome to the prototype application for my final-year project.</p>
+    <p class="author">by David E McIntyre</p>
+</section>

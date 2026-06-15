@@ -1,0 +1,53 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: var(--color-brand-primary) !important;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--font-color) !important;
+}
+
+.nav-link {
+    position: relative;
+    margin-left: 1rem;
+    font-size: 1.1rem;
+    color: var(--font-color) !important;
+    transition: color 0.2s ease;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0%;
+    height: 2px;
+    background-color: var(--color-brand-secondary);
+    transition: width 0.2s ease;
+}
+
+.navbar,
+.navbar-brand,
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link:hover {
+    color: var(--color-brand-secondary) !important;
+}
+
+.nav-link.active {
+    color: var(--color-brand-secondary) !important;
+    font-weight: 600;
+}
+

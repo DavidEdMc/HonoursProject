@@ -1,198 +1,50 @@
-:root {
-    --color-brand-primary: beige;
-    --color-brand-secondary: orange;
-    --color-brand-tertiary: white;
-    --font-body: Arial, Helvetica, sans-serif
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-.page-header {
-  display: grid;
-  grid-template-columns: 1fr 4fr 1fr;
-  justify-content: space-between;
-  text-align: center;
-  background-color: var(--color-brand-secondary);
+html {
+  position: relative;
+  min-height: 100%;
+  font-size: 14px;
 }
 
-.page-header div {
-  font-size: 30px;
+body {
+  margin-bottom: 60px;
+  font-family: var(--font-body) !important;
+  color: var(--font-color) !important;
+  background-color: var(--color-brand-tertiary) !important;
 }
 
-.page-header div button{
-  padding: 5px;
-  position: absolute;
-  font-size: 15px;
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
 }
 
-body{
-    background-color: var(--color-brand-primary);
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
 }
 
-h1 {
-    display:flex;
-    font-size: 50px;
-    color: var(--color-brand-tertiary);
+main {
+    margin-bottom: 2rem;
 }
 
-.signout-button{
-  background-color: var(--color-brand-primary);
-  text-decoration: none;
-  border: solid;
-  border-color: var(--color-brand-secondary);
-  border-radius: 8px;
-}
-.signout-button:hover{
-  background-color: var(--color-brand-secondary);
-  text-decoration: none;
-  border: solid;
-  border-color: var(--color-brand-primary);
-  border-radius: 8px;
-  cursor: pointer;
+.main-wrapper {
+    margin-top: 4rem;
 }
 
-.Side-Navigation ul {
-  padding: 0;
-  margin: 0;
+.main-header {
+    font-size: 3rem;
+    font-weight: 600;
 }
 
-.Side-Navigation li {
-  list-style: none;
-  margin: 10px 0;
+.author {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #555;
 }
 
-.Side-Navigation a{
-    text-decoration: none;
-    color:black;
-    font-size: large;
-    cursor: pointer;
-}
-
-.Side-Navigation a {
-  display: block; 
-  text-decoration: none;
-  color: black;
-  font-size: large;
-  cursor: pointer;
-
-  background: var(--color-brand-secondary);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 100px;
-  border: solid;
-  border-color: var(--color-brand-primary);
-
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
-.Side-Navigation a:hover {
-  background: var(--color-brand-primary);
-  border-color: var(--color-brand-secondary);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-}
-
-
-.logo-container{
-    display:none;
-}
-
-.card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  padding: 10px;
-}
-
-.card {
-  background: var(--color-brand-primary);
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  padding: 30px;
-  margin: 10px;
-  height: 100px;
-  width: 300px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: solid;
-  border-color: var(--color-brand-secondary);
-}
-
-.card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-.card-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.card-content {
-  padding: 15px;
-}
-
-.card-title {
-  font-size: 1.5rem;
-  margin: 0 0 10px;
-  color: black;
-}
-
-.card-description {
-  font-size: 1rem;
-  color: black;
-  margin: 0 0 15px;
-}
-
-.card-clickable {
-  text-decoration: none;
-}
-
-table {
-  table-layout: fixed;
-  width: 100%;
-}
-
-th, td {
-  width: 25%;
-  padding: 8px;
-  text-align: center;
-}
-
-@media (min-width: 960px) {
-    main{
-        display:flex;
-        flex-direction: row-reverse;
-    }
-    article, aside{
-        display:block;
-        flex-basis: 0;
-        flex-shrink: 1;
-        padding: 0.75rem;
-    }
-    article{
-        flex:4;
-        padding-right: 6em;
-    }   
-
-    aside{
-        flex:1;
-    }
-
-    footer{
-        padding-left: 20%;
-    }
-
-    .logo-container{
-        display: block;
-        text-align: left;
-        padding-top: 2em;
-    }
-
-    .logo-container img{
-        max-width: 200px;
-        max-height: 200px;
-    }
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
 }
