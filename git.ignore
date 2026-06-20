@@ -1,0 +1,26 @@
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.vs/
+.vscode/
+*.dbmdl
+*.jfm
+_ReSharper*/
+*.ncrunch*
+*.localhistory/
+*.DS_Store
+Thumbs.db
+
+# ASP.NET Core specific
+wwwroot/lib/
+wwwroot/node_modules/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Publish output
+publish/
+dist/
