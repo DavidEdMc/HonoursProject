@@ -49,16 +49,3 @@
     color: #555;
     margin: 10px 0 20px;
 }
-
-.lesson-card-button {
-    display: inline-block;
-    padding: 10px 16px;
-    background-color: var(--color-brand-primary);
-    color: var(--color-brand-tertiary);
-    border-radius: 6px;
-    text-decoration: none;
-}
-
-.lesson-card-button:hover {
-    background-color: var(--color-brand-secondary);
-}

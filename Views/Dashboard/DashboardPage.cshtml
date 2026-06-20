@@ -1,0 +1,77 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <h1 class="dashboard-title">Welcome back, User</h1>
+    <p class="dashboard-subtitle">Here’s your learning overview</p>
+
+    <!-- Continue Learning Card -->
+    <div class="dashboard-card highlight-card">
+        <h2>Continue Learning</h2>
+        <p>Your last lesson: <strong>Lesson Title Placeholder</strong></p>
+        <a class="btn btn-hero" asp-controller="Lesson" asp-action="LessonPage">
+            Resume Lesson →
+        </a>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="dashboard-grid">
+
+        <!-- Progress Overview -->
+        <div class="dashboard-card">
+            <h3>Your Progress</h3>
+
+            <div class="progress-item">
+                <p>Lessons Completed</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%;"></div>
+                </div>
+                <span class="progress-value">20%</span>
+            </div>
+
+            <div class="progress-item">
+                <p>Achievements Earned</p>
+                <span class="progress-value">0</span>
+            </div>
+
+            <div class="progress-item">
+                <p>Current Streak</p>
+                <span class="progress-value">0 days</span>
+            </div>
+        </div>
+
+        <!-- Achievement Preview -->
+        <div class="dashboard-card">
+            <h3>Recent Achievements</h3>
+            <p>No achievements yet — keep learning!</p>
+            <a class="btn btn-back" asp-controller="Account" asp-action="AchievementsPage" asp-route-from="dashboard">
+                View All Achievements →
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Recommended Lessons -->
+    <div class="dashboard-card">
+        <h3>Recommended Lessons</h3>
+        <p>Start with these lessons to continue your progress:</p>
+
+        <div class="recommended-list">
+            <div class="recommended-item">
+                <h4>Lesson Placeholder 1</h4>
+                <a class="btn btn-profile" asp-controller="Lesson" asp-action="LessonPage">Start →</a>
+            </div>
+
+            <div class="recommended-item">
+                <h4>Lesson Placeholder 2</h4>
+                <a class="btn btn-profile" asp-controller="Lesson" asp-action="LessonPage">Start →</a>
+            </div>
+        </div>
+    </div>
+
+</div>

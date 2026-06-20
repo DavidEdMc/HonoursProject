@@ -29,9 +29,10 @@
         <h2>Your Achievements</h2>
         <p>See your badges, streaks, and progress milestones.</p>
 
-        <a class="profile-button" asp-controller="Account" asp-action="AchievementsPage">
-            View Achievements
+        <a class="btn" asp-controller="Account" asp-action="AchievementsPage" asp-route-from="profile">
+            View Achievements →
         </a>
+
     </div>
 
     <hr />
@@ -39,9 +40,9 @@
     <div class="profile-section">
         <h2>Account Settings</h2>
 
-        <a class="profile-button" asp-controller="Account" asp-action="ChangePasswordPage">Change Password</a>
-        <a class="profile-button" asp-controller="Account" asp-action="EditProfilePage">Edit Profile</a>
-        <a class="profile-button" asp-controller="Account" asp-action="SettingsPage">Settings</a>
+        <a class="btn" asp-controller="Account" asp-action="ChangePasswordPage">Change Password</a>
+        <a class="btn" asp-controller="Account" asp-action="EditProfilePage">Edit Profile</a>
+        <a class="btn" asp-controller="Account" asp-action="SettingsPage">Settings</a>
     </div>
 
 </div>

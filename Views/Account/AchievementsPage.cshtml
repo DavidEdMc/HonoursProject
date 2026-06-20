@@ -1,11 +1,20 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Achievements";
+    var from = Context.Request.Query["from"].ToString();
 }
 
 <div class="achievements-container">
 
-    @await Html.PartialAsync("_BackToProfileButton")
+    @if (from == "dashboard")
+    {
+        @await Html.PartialAsync("_BackToDashboardButton")
+    }
+    else
+    {
+        @await Html.PartialAsync("_BackToProfileButton")
+    }
+
     
     <h1 class="achievements-title">Your Achievements</h1>
     <p class="achievements-subtitle">Track your progress and unlock new badges</p>

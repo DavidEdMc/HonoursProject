@@ -38,15 +38,6 @@
     border: 1px solid #ccc;
 }
 
-.edit-profile-button {
-    padding: 10px 16px;
-    background-color: var(--color-brand-primary);
-    color: var(--color-brand-tertiary);
-    border-radius: 6px;
-    border: none;
-    cursor: not-allowed;
-}
-
 .edit-profile-note {
     font-size: 0.9rem;
     color: var(--font-color);
