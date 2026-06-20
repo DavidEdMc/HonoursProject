@@ -1,0 +1,49 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Settings";
+}
+
+<div class="settings-container">
+    
+    @await Html.PartialAsync("_BackToProfileButton")
+    
+    <h1 class="settings-title">Settings</h1>
+    <p class="settings-subtitle">Manage your preferences and app experience</p>
+
+    <hr />
+
+    <!-- Theme Settings -->
+    <div class="settings-section">
+        <h2>Appearance</h2>
+        <div class="settings-item">
+            <label for="theme-toggle">Dark Mode</label>
+            <input type="checkbox" id="theme-toggle" disabled />
+        </div>
+        <p class="settings-note">Theme switching coming soon</p>
+    </div>
+
+    <hr />
+
+    <!-- Notifications -->
+    <div class="settings-section">
+        <h2>Notifications</h2>
+        <div class="settings-item">
+            <label for="email-notifications">Email Notifications</label>
+            <input type="checkbox" id="email-notifications" disabled />
+        </div>
+        <p class="settings-note">Notification preferences will be available in a future update</p>
+    </div>
+
+    <hr />
+
+    <!-- Accessibility -->
+    <div class="settings-section">
+        <h2>Accessibility</h2>
+        <div class="settings-item">
+            <label for="text-size">Large Text</label>
+            <input type="checkbox" id="text-size" disabled />
+        </div>
+        <p class="settings-note">Accessibility options coming soon</p>
+    </div>
+
+</div>

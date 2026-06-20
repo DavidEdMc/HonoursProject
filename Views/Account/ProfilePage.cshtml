@@ -1,0 +1,47 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Your Profile";
+}
+
+<div class="profile-container">
+
+    <div class="profile-header">
+        <img class="profile-avatar" src="~/images/duck-minimalist.png" alt="Profile Avatar" />
+
+        <div class="profile-info">
+            <h1 class="profile-name">Username Placeholder</h1>
+            <p class="profile-email">email@example.com</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="profile-section">
+        <h2>Progress Overview</h2>
+        <p>Lessons Completed: <strong>0</strong></p>
+        <p>Badges Earned: <strong>0</strong></p>
+        <p>Current Streak: <strong>0 days</strong></p>
+    </div>
+
+    <hr />
+
+    <div class="profile-section">
+        <h2>Your Achievements</h2>
+        <p>See your badges, streaks, and progress milestones.</p>
+
+        <a class="profile-button" asp-controller="Account" asp-action="AchievementsPage">
+            View Achievements
+        </a>
+    </div>
+
+    <hr />
+
+    <div class="profile-section">
+        <h2>Account Settings</h2>
+
+        <a class="profile-button" asp-controller="Account" asp-action="ChangePasswordPage">Change Password</a>
+        <a class="profile-button" asp-controller="Account" asp-action="EditProfilePage">Edit Profile</a>
+        <a class="profile-button" asp-controller="Account" asp-action="SettingsPage">Settings</a>
+    </div>
+
+</div>

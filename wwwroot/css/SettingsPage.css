@@ -1,0 +1,36 @@
+.settings-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.settings-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.settings-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.settings-section {
+    margin-top: 25px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 0;
+}
+
+.settings-item label {
+    font-size: 1.1rem;
+}
+
+.settings-note {
+    font-size: 0.9rem;
+    color: #888;
+}

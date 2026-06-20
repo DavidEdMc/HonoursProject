@@ -1,0 +1,75 @@
+@import url('./Common/SharedVariables.css');
+
+.auth-body {
+    background-color: var(--color-brand-tertiary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.auth-container {
+    background: white;
+    padding: 3rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-mascot img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background-color: var(--color-brand-primary);
+    padding: 0.8rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.auth-subtitle {
+    font-size: 1.1rem;
+    color: var(--font-color);
+    margin-bottom: 1.8rem;
+}
+
+.auth-form .form-control {
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 0.9rem;
+    background-color: var(--color-brand-primary);
+    color: var(--color-brand-tertiary);
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    margin-top: 0.5rem;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.auth-button:hover {
+    background-color: var(--color-brand-secondary);
+    transform: translateY(-3px);
+}
+
+.auth-forgot {
+    display: block;
+    margin-top: 1rem;
+    color: var(--color-brand-primary);
+    text-decoration: none;
+}
+
+.auth-forgot:hover {
+    color: var(--color-brand-secondary);
+    text-decoration: underline;
+}

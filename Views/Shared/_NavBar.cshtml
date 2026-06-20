@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">HonoursProject</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Lesson" asp-action="LessonSelectionPage">Lessons</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Account" asp-action="ProfilePage">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link logout-link" asp-controller="Account" asp-action="LoginPage">Logout</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>

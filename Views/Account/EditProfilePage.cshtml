@@ -1,0 +1,40 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="edit-profile-container">
+
+    @await Html.PartialAsync("_BackToProfileButton")
+    <h1 class="edit-profile-title">Edit Profile</h1>
+    <p class="edit-profile-subtitle">Update your personal information</p>
+
+    <hr />
+
+    <form class="edit-profile-form">
+
+        <!-- Username -->
+        <div class="edit-profile-field">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter new username" disabled />
+        </div>
+
+        <!-- Email -->
+        <div class="edit-profile-field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="Enter new email" disabled />
+        </div>
+
+        <!-- Avatar -->
+        <div class="edit-profile-field">
+            <label for="avatar">Profile Picture</label>
+            <input type="file" id="avatar" disabled />
+        </div>
+
+        <p class="edit-profile-note">Profile editing will be enabled in a future update</p>
+
+        <button type="submit" class="edit-profile-button" disabled>Save Changes</button>
+
+    </form>
+
+</div>

@@ -1,0 +1,64 @@
+.lesson-selection-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.lesson-selection-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.lesson-selection-subtitle {
+    font-size: 1.2rem;
+    color: var(--font-color);
+    margin-bottom: 30px;
+}
+
+.lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.lesson-card {
+    background: var(--color-brand-tertiary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.15s ease;
+}
+
+.lesson-card:hover {
+    transform: translateY(-4px);
+}
+
+.lesson-card-icon {
+    width: 80px;
+    margin-bottom: 15px;
+}
+
+.lesson-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.lesson-card-desc {
+    color: #555;
+    margin: 10px 0 20px;
+}
+
+.lesson-card-button {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: var(--color-brand-primary);
+    color: var(--color-brand-tertiary);
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.lesson-card-button:hover {
+    background-color: var(--color-brand-secondary);
+}

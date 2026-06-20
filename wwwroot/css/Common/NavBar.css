@@ -35,7 +35,7 @@
 .navbar,
 .navbar-brand,
 .nav-link {
-    color: white !important;
+    color: var(--color-brand-tertiary) !important;
 }
 
 .nav-link:hover::after {
@@ -50,4 +50,14 @@
     color: var(--color-brand-secondary) !important;
     font-weight: 600;
 }
+
+.logout-link {
+    color: var(--color-brand-tertiary) !important;
+    font-weight: 600;
+}
+
+.logout-link:hover {
+    color: var(--color-brand-secondary) !important;
+}
+
 

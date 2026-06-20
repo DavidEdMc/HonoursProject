@@ -1,0 +1,14 @@
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 8px 14px;
+    background-color: var(--color-brand-primary);
+    color: var(--color-brand-tertiary);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.back-button:hover {
+    background-color: var(--color-brand-secondary);
+}

@@ -1,0 +1,38 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Achievements";
+}
+
+<div class="achievements-container">
+
+    @await Html.PartialAsync("_BackToProfileButton")
+    
+    <h1 class="achievements-title">Your Achievements</h1>
+    <p class="achievements-subtitle">Track your progress and unlock new badges</p>
+
+    <div class="achievements-grid">
+
+        <!-- Achievement 1 -->
+        <div class="achievement-card unlocked">
+            <img src="~/images/duck-minimalist.png" class="achievement-icon" alt="Badge" />
+            <h3 class="achievement-name">First Steps</h3>
+            <p class="achievement-desc">Completed your first lesson</p>
+        </div>
+
+        <!-- Achievement 2 -->
+        <div class="achievement-card locked">
+            <img src="~/images/duck-minimalist.png" class="achievement-icon locked-icon" alt="Badge" />
+            <h3 class="achievement-name">On a Roll</h3>
+            <p class="achievement-desc">Complete 5 lessons</p>
+        </div>
+
+        <!-- Achievement 3 -->
+        <div class="achievement-card locked">
+            <img src="~/images/duck-minimalist.png" class="achievement-icon locked-icon" alt="Badge" />
+            <h3 class="achievement-name">Dedicated Learner</h3>
+            <p class="achievement-desc">Maintain a 7‑day streak</p>
+        </div>
+
+    </div>
+
+</div>
