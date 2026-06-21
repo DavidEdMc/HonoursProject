@@ -22,5 +22,6 @@
     @await Html.PartialAsync("_LayoutFooter")
     <!--Scripts-->
     @await Html.PartialAsync("_LayoutScripts")
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
