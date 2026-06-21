@@ -60,4 +60,19 @@
     color: var(--color-brand-secondary) !important;
 }
 
+@media (max-width: 991px) {
+    .navbar-nav .nav-link {
+        display: inline-block;
+        width: auto;
+        padding-left: 0;
+        padding-right: 0;
+    }
 
+    .navbar-nav .nav-item {
+        width: auto;
+    }
+
+    .navbar-nav {
+        align-items: flex-end; /* prevents stretching */
+    }
+}
