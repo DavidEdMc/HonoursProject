@@ -4,74 +4,69 @@
 }
 
 <div class="dashboard-container">
-
     <!-- Header -->
     <h1 class="dashboard-title">Welcome back, User</h1>
     <p class="dashboard-subtitle">Here’s your learning overview</p>
 
     <!-- Continue Learning Card -->
-    <div class="dashboard-card highlight-card">
-        <h2>Continue Learning</h2>
-        <p>Your last lesson: <strong>Lesson Title Placeholder</strong></p>
-        <a class="btn btn-hero" asp-controller="Lesson" asp-action="LessonPage">
-            Resume Lesson →
-        </a>
-    </div>
+    @await Html.PartialAsync("_Card", new CardViewModel {
+        Title = "Continue Learning",
+        Subtitle = "Your last lesson: Lesson Title Placeholder",
+        ButtonText = "Resume Lesson →",
+        ButtonUrl = Url.Action("LessonPage", "Lesson")
+    })
 
     <!-- Grid Layout -->
     <div class="dashboard-grid">
+        <!-- Lessons Completed -->
+        @await Html.PartialAsync("_Card", new CardViewModel {
+            Variant = "app-card-stat",
+            Content = new HtmlString(@"
+                <a href='" + Url.Action("LessonSelectionPage", "Lesson") + @"' class='stat-value stat-link'>
+                    20%
+                </a>
+                <div class='stat-label'>Lessons Completed</div>
+            ")
+        })
 
-        <!-- Progress Overview -->
-        <div class="dashboard-card">
-            <h3>Your Progress</h3>
+        <!-- Achievements Earned -->
+        @await Html.PartialAsync("_Card", new CardViewModel {
+            Variant = "app-card-stat",
+            Content = new HtmlString(@"
+                <a href='" + Url.Action("AchievementsPage", "Account", new { from = "dashboard" }) + @"' class='stat-value stat-link'>
+                    0
+                </a>
+                <div class='stat-label'>Achievements Earned</div>
+            ")
+        })
 
-            <div class="progress-item">
-                <p>Lessons Completed</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 20%;"></div>
-                </div>
-                <span class="progress-value">20%</span>
-            </div>
-
-            <div class="progress-item">
-                <p>Achievements Earned</p>
-                <span class="progress-value">0</span>
-            </div>
-
-            <div class="progress-item">
-                <p>Current Streak</p>
-                <span class="progress-value">0 days</span>
-            </div>
-        </div>
-
-        <!-- Achievement Preview -->
-        <div class="dashboard-card">
-            <h3>Recent Achievements</h3>
-            <p>No achievements yet — keep learning!</p>
-            <a class="btn btn-back" asp-controller="Account" asp-action="AchievementsPage" asp-route-from="dashboard">
-                View All Achievements →
-            </a>
-
-        </div>
-
+        <!-- Current Streak -->
+        @await Html.PartialAsync("_Card", new CardViewModel {
+            Variant = "app-card-stat",
+            Content = new HtmlString(@"
+                <div class='stat-value'>0</div>
+                <div class='stat-label'>Day Streak</div>
+            ")
+        })
     </div>
 
     <!-- Recommended Lessons -->
-    <div class="dashboard-card">
-        <h3>Recommended Lessons</h3>
-        <p>Start with these lessons to continue your progress:</p>
+    @await Html.PartialAsync("_Card", new CardViewModel {
+        Title = "Recommended Lessons",
+        Content = new HtmlString(@"
+            <p>Start with these lessons to continue your progress:</p>
 
-        <div class="recommended-list">
-            <div class="recommended-item">
-                <h4>Lesson Placeholder 1</h4>
-                <a class="btn btn-profile" asp-controller="Lesson" asp-action="LessonPage">Start →</a>
+            <div class='recommended-list'>
+                <div class='recommended-item'>
+                    <h4>Lesson Placeholder 1</h4>
+                    <a class='btn' href='/Lesson/LessonPage'>Start →</a>
+                </div>
+
+                <div class='recommended-item'>
+                    <h4>Lesson Placeholder 2</h4>
+                    <a class='btn' href='/Lesson/LessonPage'>Start →</a>
+                </div>
             </div>
-
-            <div class="recommended-item">
-                <h4>Lesson Placeholder 2</h4>
-                <a class="btn btn-profile" asp-controller="Lesson" asp-action="LessonPage">Start →</a>
-            </div>
-        </div>
-    </div>
-
+        ")
+    })
 </div>

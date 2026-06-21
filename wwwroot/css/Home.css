@@ -8,6 +8,14 @@
     border-radius: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     margin-top: 2rem;
+    border-left: 6px solid var(--color-brand-primary);
+    border-right: 6px solid var(--color-brand-primary);
+    transition: border-color 0.2s ease;
+}
+
+.hero-container:hover {
+    border-left: 6px solid var(--color-brand-secondary);
+    border-right: 6px solid var(--color-brand-secondary);
 }
 
 .hero-mascot img {
