@@ -5,26 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HonoursProject</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/Common/SharedVariables.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Common/NavBar.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Common/Footer.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Profile.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/LessonSelectionPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/LessonPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/AchievementsPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/SettingsPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/EditProfilePage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/ChangePasswordPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/DashboardPage.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HonoursProject.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Common/Cards.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Common/Buttons.css" asp-append-version="true" />
+    <!--Styles-->
+    @await Html.PartialAsync("_LayoutStyles")
 </head>
 <body>
     <header>
+        <!--NavBar-->
         @await Html.PartialAsync("_NavBar")
     </header>
     <div class="container">
@@ -32,15 +18,9 @@
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - HonoursProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <!--Footer-->
+    @await Html.PartialAsync("_LayoutFooter")
+    <!--Scripts-->
+    @await Html.PartialAsync("_LayoutScripts")
 </body>
 </html>
