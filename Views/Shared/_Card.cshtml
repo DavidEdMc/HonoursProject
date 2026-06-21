@@ -1,0 +1,45 @@
+@model HonoursProject.Models.UI.CardViewModel
+
+<div class="app-card @Model.Variant @Model.CustomClasses">
+
+    @* Optional Image *@
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" class="app-card-image" alt="Card Image" />
+    }
+
+    @* Title *@
+    @if (!string.IsNullOrEmpty(Model.Title))
+    {
+        <h3 class="app-card-title">@Model.Title</h3>
+    }
+
+    @* Subtitle *@
+    @if (!string.IsNullOrEmpty(Model.Subtitle))
+    {
+        <p class="app-card-subtitle">@Model.Subtitle</p>
+    }
+
+    @* Optional Content Block *@
+    @if (Model.Content != null)
+    {
+        <div class="app-card-content">
+            @Model.Content
+        </div>
+    }
+
+    @* Automatic Button Rendering *@
+    @if (!string.IsNullOrEmpty(Model.ButtonText) && !string.IsNullOrEmpty(Model.ButtonUrl))
+    {
+        <div class="app-card-footer">
+            <a href="@Model.ButtonUrl" class="btn">@Model.ButtonText</a>
+        </div>
+    }
+    else if (Model.Footer != null)
+    {
+        <div class="app-card-footer">
+            @Model.Footer
+        </div>
+    }
+
+</div>

@@ -1,0 +1,59 @@
+.app-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-brand-tertiary);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+.app-card-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.app-card-subtitle {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.app-card-content {
+    margin-bottom: 15px;
+}
+
+.app-card-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+/* Variants */
+.app-card-highlight {
+    border-left: 6px solid var(--color-brand-primary);
+}
+
+.app-card-compact {
+    padding: 12px;
+}
+
+.app-card-clickable {
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.app-card-clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.app-card-image {
+    display: block;
+    margin: 0 auto 15px auto;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}

@@ -10,30 +10,35 @@
 
     <div class="lesson-grid">
 
-        <!-- Placeholder Lesson Card 1 -->
-        <div class="lesson-card">
-            <img src="~/images/duck-minimalist.png" class="lesson-card-icon" alt="Lesson Icon" />
-            <h3 class="lesson-card-title">Lesson 1: Introduction</h3>
-            <p class="lesson-card-desc">A gentle introduction to the basics.</p>
-            <a asp-controller="Lesson" asp-action="LessonPage" class="btn btn-lesson">Start Lesson</a>
-        </div>
+       @await Html.PartialAsync("_Card", new CardViewModel {
+            Title = "Lesson 1: Introduction",
+            Subtitle = "A gentle introduction to the basics.",
+            ImageUrl = "/images/duck-minimalist.png",
+            Variant = "app-card-clickable",
+            ButtonText = "Start Lesson",
+            ButtonUrl = Url.Action("LessonPage", "Lesson")
+        })
 
-        <!-- Placeholder Lesson Card 2 -->
-        <div class="lesson-card">
-            <img src="~/images/duck-minimalist.png" class="lesson-card-icon" alt="Lesson Icon" />
-            <h3 class="lesson-card-title">Lesson 2: Intermediate Concepts</h3>
-            <p class="lesson-card-desc">Build on what you've learned.</p>
-            <a asp-controller="Lesson" asp-action="LessonPage" class="btn btn-lesson">Start Lesson</a>
-        </div>
 
-        <!-- Placeholder Lesson Card 3 -->
-        <div class="lesson-card">
-            <img src="~/images/duck-minimalist.png" class="lesson-card-icon" alt="Lesson Icon" />
-            <h3 class="lesson-card-title">Lesson 3: Advanced Topics</h3>
-            <p class="lesson-card-desc">Challenge yourself with deeper material.</p>
-            <a asp-controller="Lesson" asp-action="LessonPage" class="btn btn-lesson">Start Lesson</a>
-        </div>
 
+        @await Html.PartialAsync("_Card", new CardViewModel {
+            Title = "Lesson 2: Intermediate Concepts",
+            Subtitle = "Build on what you've learned.",
+            ImageUrl = "/images/duck-minimalist.png",
+            Variant = "app-card-clickable",
+            ButtonText = "Start Lesson",
+            ButtonUrl = Url.Action("LessonPage", "Lesson")
+        })
+
+
+        @await Html.PartialAsync("_Card", new CardViewModel {
+            Title = "Lesson 3: Advanced Topics",
+            Subtitle = "Challenge yourself with deeper material.",
+            ImageUrl = "/images/duck-minimalist.png",
+            Variant = "app-card-clickable",
+            ButtonText = "Start Lesson",
+            ButtonUrl = Url.Action("LessonPage", "Lesson")
+        })
     </div>
 
 </div>
