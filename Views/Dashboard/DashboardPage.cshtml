@@ -18,29 +18,27 @@
 
     <!-- Grid Layout -->
     <div class="dashboard-grid">
-        <!-- Lessons Completed -->
-        @await Html.PartialAsync("_Card", new CardViewModel {
-            Variant = "app-card-stat",
-            Content = new HtmlString(@"
-                <a href='" + Url.Action("LessonSelectionPage", "Lesson") + @"' class='stat-value stat-link'>
-                    20%
-                </a>
-                <div class='stat-label'>Lessons Completed</div>
-            ")
-        })
-
-        <!-- Achievements Earned -->
-        @await Html.PartialAsync("_Card", new CardViewModel {
-            Variant = "app-card-stat",
-            Content = new HtmlString(@"
-                <a href='" + Url.Action("AchievementsPage", "Account", new { from = "dashboard" }) + @"' class='stat-value stat-link'>
-                    0
-                </a>
-                <div class='stat-label'>Achievements Earned</div>
-            ")
-        })
-
-        <!-- Current Streak -->
+        <!-- Lessons Completed (entire card clickable) -->
+        <a href="@Url.Action("LessonSelectionPage", "Lesson")" class="app-card-link-wrapper">
+            @await Html.PartialAsync("_Card", new CardViewModel {
+                Variant = "app-card-stat app-card-clickable",
+                Content = new HtmlString(@"
+                    <div class='stat-value'>20%</div>
+                    <div class='stat-label'>Lessons Completed</div>
+                ")
+            })
+        </a>
+        <!-- Achievements Earned (entire card clickable) -->
+        <a href="@Url.Action("AchievementsPage", "Account", new { from = "dashboard" })" class="app-card-link-wrapper">
+            @await Html.PartialAsync("_Card", new CardViewModel {
+                Variant = "app-card-stat app-card-clickable",
+                Content = new HtmlString(@"
+                    <div class='stat-value'>0</div>
+                    <div class='stat-label'>Achievements Earned</div>
+                ")
+            })
+        </a>
+        <!-- Current Streak (not clickable) -->
         @await Html.PartialAsync("_Card", new CardViewModel {
             Variant = "app-card-stat",
             Content = new HtmlString(@"
@@ -48,7 +46,9 @@
                 <div class='stat-label'>Day Streak</div>
             ")
         })
+
     </div>
+
 
     <!-- Recommended Lessons -->
     @await Html.PartialAsync("_Card", new CardViewModel {

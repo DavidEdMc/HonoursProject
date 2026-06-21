@@ -54,6 +54,17 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
+.app-card-clickable:hover .stat-value {
+    color: var(--color-brand-secondary);
+    transition: color 0.2s ease;
+}
+
+.app-card-link-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .app-card-image {
     display: block;
     margin: 0 auto 15px auto;

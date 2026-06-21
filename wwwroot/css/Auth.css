@@ -16,6 +16,14 @@
     text-align: center;
     width: 100%;
     max-width: 420px;
+    border-left: 6px solid var(--color-brand-primary);
+    border-right: 6px solid var(--color-brand-primary);
+    transition: border-color 0.2s ease;
+}
+
+.auth-container:hover {
+    border-left: 6px solid var(--color-brand-secondary);
+    border-right: 6px solid var(--color-brand-secondary);
 }
 
 .auth-mascot img {
