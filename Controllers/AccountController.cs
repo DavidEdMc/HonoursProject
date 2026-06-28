@@ -51,8 +51,6 @@ public class AccountController : Controller
         }
     }
 
-
-
     public IActionResult ForgotPassword()
     {
         return View();
@@ -73,27 +71,58 @@ public class AccountController : Controller
         }
 
         var user = _userService.GetUserByUsername(username);
-
         return View(user);
     }
 
 
+
     public IActionResult AchievementsPage()
     {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+        {
+            return RedirectToAction("LoginPage", "Account");
+        }
+
         return View();
     }
 
     public IActionResult SettingsPage()
     {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+        {
+            return RedirectToAction("LoginPage", "Account");
+        }
+
         return View();
     }
 
     public IActionResult EditProfilePage()
     {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+        {
+            return RedirectToAction("LoginPage", "Account");
+        }
+
         return View();
     }
     public IActionResult ChangePasswordPage()
     {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+        {
+            return RedirectToAction("LoginPage", "Account");
+        }
+        
         return View();
     }
+
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("LoginPage");
+    }
+
 }

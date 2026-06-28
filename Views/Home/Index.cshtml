@@ -1,14 +1,15 @@
-﻿@{
+﻿@model HonoursProject.Models.User
+@{
     ViewData["Title"] = "Home";
 }
 <div class="hero-container">
     <div class="hero-mascot">
         <!-- Placeholder for duck mascot image -->
-        <img src="~/assets/images/duck-minimalist.png" alt="Mascot Duck" />
+        <img src="/assets/images/duck-minimalist.png" alt="Mascot Duck" />
     </div>
 
     <div class="hero-content">
-        <h1 class="hero-title">Welcome back!</h1>
+        <h1 class="hero-title">Welcome back! @Model.Username</h1>
         <p class="hero-subtitle">Ready to learn something new today?</p>
 
         <a class="btn btn-hero" asp-controller="Lesson" asp-action="LessonSelectionPage">Select a lesson</a>

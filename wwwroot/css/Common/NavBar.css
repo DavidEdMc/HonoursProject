@@ -60,6 +60,14 @@
     color: var(--color-brand-secondary) !important;
 }
 
+.nav-profile-pic {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
 @media (max-width: 991px) {
     .navbar-nav .nav-link {
         display: inline-block;

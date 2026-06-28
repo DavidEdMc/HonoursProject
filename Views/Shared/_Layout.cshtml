@@ -23,5 +23,8 @@
     <!--Scripts-->
     @await Html.PartialAsync("_LayoutScripts")
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        window.addEventListener("unload", function () { });
+    </script>
 </body>
 </html>

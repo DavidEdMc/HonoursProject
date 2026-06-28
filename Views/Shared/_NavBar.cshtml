@@ -23,10 +23,16 @@
 
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="Account" asp-action="ProfilePage">Profile</a>
+                    <a class="nav-link d-flex align-items-center" asp-controller="Account" asp-action="ProfilePage">
+                        <img src="@Context.Session.GetString("profile_picture")"
+                            alt="Profile Picture"
+                            class="nav-profile-pic me-2" />
+                        Profile
+                    </a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link logout-link" asp-controller="Account" asp-action="LoginPage">Logout</a>
+                    <a class="nav-link logout-link" asp-controller="Account" asp-action="Logout">Logout</a>
                 </li>
             </ul>
         </div>

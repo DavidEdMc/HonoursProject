@@ -1,18 +1,27 @@
+@model HonoursProject.Models.User
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Your Profile";
+    
+
 }
 
 <div class="profile-container">
 
     <div class="profile-header">
-        <img class="profile-avatar" src="~/images/duck-minimalist.png" alt="Profile Avatar" />
+        <img class="profile-avatar"
+            src="@(string.IsNullOrEmpty(Model.ProfilePicture) 
+                    ? Url.Content("~/images/duck-minimalist.png") 
+                    : Model.ProfilePicture)"
+            alt="Profile Avatar" />
+
 
         <div class="profile-info">
-            <h1 class="profile-name">Username Placeholder</h1>
-            <p class="profile-email">email@example.com</p>
+            <h1 class="profile-name">@Model.Username</h1>
+            <p class="profile-email">@Model.EmailAddress</p>
         </div>
     </div>
+
 
     <hr />
 
