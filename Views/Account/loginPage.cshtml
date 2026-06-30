@@ -28,11 +28,22 @@
         <button type="submit" class="btn btn-auth">Sign In</button>
 
         <a class="auth-forgot" href="/Account/ForgotPassword">Forgot your password?</a>
+        <p class="register-link">
+            Don’t have an account?
+            <a asp-controller="Account" asp-action="RegisterPage">Create one →</a>
+        </p>
 
         @if (ViewBag.Error != null)
         {
             <p class="text-danger mt-2">@ViewBag.Error</p>
         }
+        @if (TempData["RegisterMessage"] != null)
+        {
+            <div class="alert alert-danger mt-3">
+                @TempData["RegisterMessage"]
+            </div>
+        }
+
 
     </form>
 </div>

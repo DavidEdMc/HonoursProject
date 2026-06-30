@@ -177,6 +177,52 @@ public class AccountController : Controller
         return RedirectToAction("ChangePasswordPage");
     }
 
+    public IActionResult RegisterPage()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult Register(string Username, string EmailAddress, string Password)
+    {
+        // Check if username already exists
+        var existingUser = _userService.GetUserByUsername(Username);
+        if (existingUser != null)
+        {
+            TempData["RegisterMessage"] = "Username already taken.";
+            return RedirectToAction("RegisterPage");
+        }
+
+        // Check if email already exists
+        var existingEmail = _userService.GetUserByEmail(EmailAddress);
+        if (existingEmail != null)
+        {
+            TempData["RegisterMessage"] = "Email address is already registered.";
+            return RedirectToAction("RegisterPage");
+        }
+
+        // Hash password
+        var hash = _userService.HashPassword(Password);
+
+        // Create user object
+        var newUser = new User
+        {
+            Username = Username,
+            EmailAddress = EmailAddress,
+            Password = hash,
+            ProfilePicture = "/assets/images/default-avatar.png" // default avatar
+        };
+
+        // Save to DB
+        _userService.CreateUser(newUser);
+
+        // Auto-login
+        HttpContext.Session.SetString("username", newUser.Username);
+        HttpContext.Session.SetString("profile_picture", newUser.ProfilePicture);
+
+        return RedirectToAction("ProfilePage");
+    }
+
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();

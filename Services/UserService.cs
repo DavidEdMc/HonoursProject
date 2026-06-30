@@ -47,6 +47,38 @@ namespace HonoursProject.Services
             return user;
         }
 
+        public User GetUserByEmail(string email)
+        {
+            string query = "SELECT * FROM tb_users WHERE email_address = @email";
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new User
+                            {
+                                Id = reader.GetInt32("id"),
+                                Username = reader.GetString("username"),
+                                EmailAddress = reader.GetString("email_address"),
+                                Password = reader.GetString("password"),
+                                ProfilePicture = reader.GetString("profile_picture")
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
         public bool VerifyPassword(string plain, string hash)
         {
             return BCrypt.Net.BCrypt.Verify(plain, hash);
@@ -96,6 +128,24 @@ namespace HonoursProject.Services
             }
         }
 
+        public void CreateUser(User user)
+        {
+            string query = @"INSERT INTO tb_users (username, email_address, password, profile_picture)
+                            VALUES (@username, @email, @password, @picture)";
 
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", user.Username);
+                    cmd.Parameters.AddWithValue("@email", user.EmailAddress);
+                    cmd.Parameters.AddWithValue("@password", user.Password);
+                    cmd.Parameters.AddWithValue("@picture", user.ProfilePicture);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

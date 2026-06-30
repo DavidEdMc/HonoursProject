@@ -1,0 +1,48 @@
+@model HonoursProject.Models.User
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="auth-container">
+
+    <div class="auth-mascot">
+        <img src="/assets/images/duck-minimalist.png" alt="Mascot Duck" />
+    </div>
+
+    <h1 class="auth-title">Create Your Account</h1>
+    <p class="auth-subtitle">Join the platform and start learning!</p>
+
+    <form class="auth-form" asp-controller="Account" asp-action="Register" method="post">
+
+        <div class="form-group mb-3">
+            <label for="username">Username</label>
+            <input id="username" name="Username" class="form-control" type="text" placeholder="Choose a username" required />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="email">Email Address</label>
+            <input id="email" name="EmailAddress" class="form-control" type="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="password">Password</label>
+            <input id="password" name="Password" class="form-control" type="password" placeholder="Create a password" required />
+        </div>
+
+        <button type="submit" class="btn btn-auth">Create Account</button>
+
+        @if (TempData["RegisterMessage"] != null)
+        {
+            <div class="alert alert-danger mt-3">
+                @TempData["RegisterMessage"]
+            </div>
+        }
+
+        <p class="register-link mt-3">
+            Already have an account?
+            <a asp-controller="Account" asp-action="LoginPage">Sign in →</a>
+        </p>
+
+    </form>
+</div>
