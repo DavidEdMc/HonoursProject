@@ -16,7 +16,7 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost]
+   [HttpPost]
     public IActionResult Login(string username, string password)
     {
         var user = _userService.GetUserByUsername(username);
@@ -27,9 +27,8 @@ public class AccountController : Controller
             return View("LoginPage");
         }
 
-        string hashedInput = ComputeSha256(password);
-
-        if (hashedInput != user.Password)
+        // BCrypt verification
+        if (!_userService.VerifyPassword(password, user.Password))
         {
             ViewBag.Error = "Invalid username or password";
             return View("LoginPage");
@@ -40,15 +39,6 @@ public class AccountController : Controller
         HttpContext.Session.SetString("profile_picture", user.ProfilePicture);
 
         return RedirectToAction("Index", "Home");
-    }
-
-    private string ComputeSha256(string raw)
-    {
-        using (var sha = SHA256.Create())
-        {
-            var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(raw));
-            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
-        }
     }
 
     public IActionResult ForgotPassword()
@@ -119,10 +109,37 @@ public class AccountController : Controller
         return View();
     }
 
+    [HttpPost]
+    public IActionResult ChangePassword(string CurrentPassword, string NewPassword, string ConfirmPassword)
+    {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+            return RedirectToAction("LoginPage");
+
+        if (NewPassword != ConfirmPassword)
+        {
+            TempData["PasswordMessage"] = "New passwords do not match.";
+            return RedirectToAction("ChangePasswordPage");
+        }
+
+        var user = _userService.GetUserByUsername(username);
+
+        if (!_userService.VerifyPassword(CurrentPassword, user.Password))
+        {
+            TempData["PasswordMessage"] = "Current password is incorrect.";
+            return RedirectToAction("ChangePasswordPage");
+        }
+
+        var newHash = _userService.HashPassword(NewPassword);
+        _userService.UpdatePassword(username, newHash);
+
+        TempData["PasswordMessage"] = "Password updated successfully.";
+        return RedirectToAction("ChangePasswordPage");
+    }
+
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
         return RedirectToAction("LoginPage");
     }
-
 }

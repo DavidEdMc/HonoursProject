@@ -1,5 +1,6 @@
 using MySql.Data.MySqlClient;
 using HonoursProject.Models;
+using BCrypt.Net;
 
 namespace HonoursProject.Services
 {
@@ -45,5 +46,32 @@ namespace HonoursProject.Services
 
             return user;
         }
+
+        public bool VerifyPassword(string plain, string hash)
+        {
+            return BCrypt.Net.BCrypt.Verify(plain, hash);
+        }
+
+        public string HashPassword(string plain)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(plain);
+        }
+
+        public void UpdatePassword(string username, string newHash)
+        {
+            string query = "UPDATE tb_users SET password = @password WHERE username = @username";
+
+            using (var connection = _db.GetConnection())
+            {
+                connection.Open();
+                using (var cmd = new MySqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@password", newHash);
+                    cmd.Parameters.AddWithValue("@username", username);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }
