@@ -46,6 +46,57 @@ public class AccountController : Controller
         return View();
     }
 
+    [HttpPost]
+    public IActionResult ForgotPassword(string EmailAddress)
+    {
+        var user = _userService.GetUserByEmail(EmailAddress);
+
+        if (user == null)
+        {
+            TempData["ResetMessage"] = "No account found with that email.";
+            return RedirectToAction("ForgotPassword");
+        }
+
+        // Store email temporarily
+        TempData["ResetEmail"] = EmailAddress;
+
+        return RedirectToAction("ResetPasswordPage");
+    }
+
+    public IActionResult ResetPasswordPage()
+    {
+        // If TempData was lost (e.g., direct navigation), redirect back
+        if (TempData["ResetEmail"] == null)
+            return RedirectToAction("ForgotPassword");
+
+        return View();
+    }
+
+
+    [HttpPost]
+    public IActionResult ResetPassword(string EmailAddress, string NewPassword, string ConfirmPassword)
+    {
+        if (NewPassword != ConfirmPassword)
+        {
+            TempData["ResetError"] = "Passwords do not match.";
+            TempData["ResetEmail"] = EmailAddress;
+            return RedirectToAction("ResetPasswordPage");
+        }
+
+        var user = _userService.GetUserByEmail(EmailAddress);
+
+        if (user == null)
+        {
+            TempData["ResetError"] = "Account not found.";
+            return RedirectToAction("ForgotPassword");
+        }
+
+        var newHash = _userService.HashPassword(NewPassword);
+        _userService.UpdatePassword(user.Username, newHash);
+
+        return RedirectToAction("ResetConfirmation");
+    }
+
     public IActionResult ResetConfirmation()
     {
         return View();

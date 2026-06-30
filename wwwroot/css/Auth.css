@@ -64,3 +64,14 @@
     color: var(--color-brand-secondary);
     text-decoration: underline;
 }
+
+.auth-register a{
+    margin-top: 1rem;
+    color: var(--color-brand-primary);
+    text-decoration: none;
+}
+
+.auth-register a:hover {
+    color: var(--color-brand-secondary);
+    text-decoration: underline;
+}
