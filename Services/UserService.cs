@@ -73,5 +73,29 @@ namespace HonoursProject.Services
             }
         }
 
+        public void UpdateProfile(User user)
+        {
+            string query = @"UPDATE tb_users 
+                            SET username = @username, 
+                                email_address = @email, 
+                                profile_picture = @picture 
+                            WHERE id = @id";
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", user.Username);
+                    cmd.Parameters.AddWithValue("@email", user.EmailAddress);
+                    cmd.Parameters.AddWithValue("@picture", user.ProfilePicture);
+                    cmd.Parameters.AddWithValue("@id", user.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
     }
 }

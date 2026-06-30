@@ -11,30 +11,33 @@
 
     <hr />
 
-    <form class="edit-profile-form">
-
+    <form class="edit-profile-form" asp-controller="Account" asp-action="EditProfile" method="post" enctype="multipart/form-data">
         <!-- Username -->
         <div class="edit-profile-field">
             <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Enter new username" disabled />
+            <input type="text" id="username" name="Username" value="@Model.Username" required />
         </div>
 
         <!-- Email -->
         <div class="edit-profile-field">
             <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="Enter new email" disabled />
+            <input type="email" id="email" name="EmailAddress" value="@Model.EmailAddress" required />
         </div>
 
         <!-- Avatar -->
         <div class="edit-profile-field">
             <label for="avatar">Profile Picture</label>
-            <input type="file" id="avatar" disabled />
+            <input type="file" id="avatar" name="AvatarFile" />
         </div>
 
-        <p class="edit-profile-note">Profile editing will be enabled in a future update</p>
-
-        <button type="submit" class="btn btn-edit-profile" disabled>Save Changes</button>
+        <button type="submit" class="btn btn-edit-profile">Save Changes</button>
 
     </form>
+    @if (TempData["ProfileMessage"] != null)
+    {
+        <div class="alert alert-success mt-3">
+            @TempData["ProfileMessage"]
+        </div>
+    }
 
 </div>

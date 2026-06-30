@@ -92,12 +92,52 @@ public class AccountController : Controller
     {
         var username = HttpContext.Session.GetString("username");
         if (username == null)
+            return RedirectToAction("LoginPage");
+
+        var user = _userService.GetUserByUsername(username);
+        return View(user);
+    }
+
+    [HttpPost]
+    public IActionResult EditProfile(string Username, string EmailAddress, IFormFile AvatarFile)
+    {
+        var currentUsername = HttpContext.Session.GetString("username");
+        if (currentUsername == null)
+            return RedirectToAction("LoginPage");
+
+        // Get current user
+        var user = _userService.GetUserByUsername(currentUsername);
+
+        // Update username + email
+        user.Username = Username;
+        user.EmailAddress = EmailAddress;
+
+        // Handle profile picture upload
+        if (AvatarFile != null && AvatarFile.Length > 0)
         {
-            return RedirectToAction("LoginPage", "Account");
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(AvatarFile.FileName);
+            var filePath = Path.Combine("wwwroot/assets/profile_avatar", fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                AvatarFile.CopyTo(stream);
+            }
+
+            user.ProfilePicture = "/assets/profile_avatar/" + fileName;
         }
 
-        return View();
+        // Save changes
+        _userService.UpdateProfile(user);
+
+        // Update session if username or picture changed
+        HttpContext.Session.SetString("username", user.Username);
+        HttpContext.Session.SetString("profile_picture", user.ProfilePicture);
+
+        TempData["ProfileMessage"] = "Profile updated successfully!";
+        return RedirectToAction("EditProfilePage");
     }
+
+
     public IActionResult ChangePasswordPage()
     {
         var username = HttpContext.Session.GetString("username");
