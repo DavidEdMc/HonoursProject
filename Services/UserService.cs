@@ -147,5 +147,112 @@ namespace HonoursProject.Services
                 }
             }
         }
+
+        public UserStats GetStatsByUserId(int userId)
+        {
+            string query = "SELECT * FROM tb_user_stats WHERE user_id = @userId";
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new UserStats
+                            {
+                                Id = reader.GetInt32("id"),
+                                UserId = reader.GetInt32("user_id"),
+                                LessonsCompleted = reader.GetInt32("lessons_completed"),
+                                Score = reader.GetInt32("score"),
+                                FastestLessonSeconds = reader.IsDBNull(reader.GetOrdinal("fastest_lesson_seconds"))
+                                    ? 0
+                                    : reader.GetInt32("fastest_lesson_seconds"),
+
+                                CurrentStreak = reader.GetInt32("current_streak"),
+                                HighestStreak = reader.GetInt32("highest_streak"),
+                                LastLessonDate = reader.IsDBNull(reader.GetOrdinal("last_lesson_date"))
+                                    ? null
+                                    : reader.GetDateTime("last_lesson_date")
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public void UpdateStats(UserStats stats)
+        {
+            string query = @"UPDATE tb_user_stats 
+                            SET lessons_completed = @lessons,
+                                score = @score,
+                                fastest_lesson_seconds = @fastest,
+                                current_streak = @current,
+                                highest_streak = @highest,
+                                last_lesson_date = @lastDate
+                            WHERE user_id = @userId";
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@lessons", stats.LessonsCompleted);
+                    cmd.Parameters.AddWithValue("@score", stats.Score);
+                    cmd.Parameters.AddWithValue("@fastest", stats.FastestLessonSeconds);
+                    cmd.Parameters.AddWithValue("@current", stats.CurrentStreak);
+                    cmd.Parameters.AddWithValue("@highest", stats.HighestStreak);
+                    cmd.Parameters.AddWithValue("@lastDate", stats.LastLessonDate);
+                    cmd.Parameters.AddWithValue("@userId", stats.UserId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<LeaderboardEntry> GetLeaderboard()
+        {
+            string query = @"
+                SELECT u.username, s.score, s.lessons_completed, s.highest_streak, s.fastest_lesson_seconds
+                FROM tb_user_stats s
+                JOIN tb_users u ON u.id = s.user_id
+                ORDER BY s.score DESC
+                LIMIT 10;
+            ";
+
+            var list = new List<LeaderboardEntry>();
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new LeaderboardEntry
+                        {
+                            Username = reader.GetString("username"),
+                            Score = reader.GetInt32("score"),
+                            LessonsCompleted = reader.GetInt32("lessons_completed"),
+                            HighestStreak = reader.GetInt32("highest_streak"),
+                            FastestLessonSeconds = reader.IsDBNull(reader.GetOrdinal("fastest_lesson_seconds"))
+                                ? 0
+                                : reader.GetInt32("fastest_lesson_seconds")
+                        });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
     }
 }

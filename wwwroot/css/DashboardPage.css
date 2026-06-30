@@ -31,7 +31,7 @@
 /* Grid Layout */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
 }
 
@@ -63,6 +63,113 @@
 
 .recommended-item {
     display: flex;
-    justify-content: space-between;
+   justify-content: space-between;
     align-items: center;
+}
+
+/* Leaderboard */
+.leaderboard-card {
+    margin-top: 30px;
+}
+
+.leaderboard-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+/* FIXED TABLE LAYOUT */
+.leaderboard-table {
+    width: 100%;
+    table-layout: fixed; /* prevents shifting when sorting */
+}
+
+/* Prevent wrapping + ellipsis */
+.leaderboard-table th,
+.leaderboard-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    padding: 8px 6px;
+}
+
+/* Leaderboard header hover */
+.leaderboard-table th[data-sort]:hover {
+    color: var(--color-brand-secondary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+
+/* Column widths */
+.leaderboard-table th:nth-child(1),
+.leaderboard-table td:nth-child(1) {
+    width: 40px;   /* Rank */
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+    width: 160px;  /* Username */
+}
+
+.leaderboard-table th:nth-child(3),
+.leaderboard-table td:nth-child(3) {
+    width: 80px;   /* Score */
+}
+
+.leaderboard-table th:nth-child(4),
+.leaderboard-table td:nth-child(4) {
+    width: 100px;  /* Lessons */
+}
+
+.leaderboard-table th:nth-child(5),
+.leaderboard-table td:nth-child(5) {
+    width: 100px;  /* Streak */
+}
+
+.leaderboard-table th:nth-child(6),
+.leaderboard-table td:nth-child(6) {
+    width: 130px;  /* Fastest Lesson */
+}
+
+/* Row background styling */
+.leaderboard-table tbody tr {
+    background: var(--color-brand-tertiary);
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+    background: #666;
+}
+
+.leaderboard-table tbody tr:hover {
+    background: var(--color-brand-tertiary-hover);
+    transition: background 0.2s ease;
+}
+
+/* Refresh icon */
+.refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+    color: #666;
+}
+
+.refresh-btn:hover {
+    color: var(--color-brand-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
 }

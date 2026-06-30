@@ -1,0 +1,115 @@
+@model List<HonoursProject.Models.LeaderboardEntry>
+
+<div class="leaderboard-card app-card">
+    <div class="leaderboard-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 class="leaderboard-title">Leaderboard</h2>
+
+        <!-- Refresh Icon -->
+        <button id="clearSortBtn" class="refresh-btn" title="Clear Sort">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0114.13-3.36L23 10"></path>
+                <path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"></path>
+            </svg>
+        </button>
+    </div>
+
+    <table class="table leaderboard-table" id="leaderboardTable">
+        <thead>
+            <tr>
+                <th data-sort="rank">#</th>
+                <th data-sort="username">User</th>
+                <th data-sort="score">Score</th>
+                <th data-sort="lessons">Lessons</th>
+                <th data-sort="streak">Streak</th>
+                <th data-sort="fastest">Fastest Lesson</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @{
+                var rank = 1;
+            }
+
+            @foreach (var entry in Model)
+            {
+                <tr>
+                    <td>@rank</td>
+                    <td>@entry.Username</td>
+                    <td>@entry.Score</td>
+                    <td>@entry.LessonsCompleted</td>
+                    <td>@entry.HighestStreak days</td>
+                    <td>
+                        @(entry.FastestLessonSeconds > 0 
+                            ? entry.FastestLessonSeconds + "s"
+                            : "—")
+                    </td>
+                </tr>
+
+                rank++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const table = document.getElementById("leaderboardTable");
+        const headers = table.querySelectorAll("th[data-sort]");
+        const tbody = table.querySelector("tbody");
+        const clearBtn = document.getElementById("clearSortBtn");
+
+        let sortDirection = {};
+        let originalRows = Array.from(tbody.querySelectorAll("tr"));
+
+        headers.forEach(header => {
+            header.style.cursor = "pointer";
+
+            header.addEventListener("click", () => {
+                const column = header.getAttribute("data-sort");
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+
+                sortDirection[column] = !sortDirection[column];
+
+                headers.forEach(h => h.innerHTML = h.innerHTML.replace(" ▲", "").replace(" ▼", ""));
+                header.innerHTML += sortDirection[column] ? " ▲" : " ▼";
+
+                /* SORTING BLOCK */
+                rows.sort((a, b) => {
+                    const aVal = a.children[header.cellIndex].innerText
+                        .replace(" days", "")
+                        .replace("s", "");
+
+                    const bVal = b.children[header.cellIndex].innerText
+                        .replace(" days", "")
+                        .replace("s", "");
+
+                    // TEXT SORT for username column
+                    if (column === "username") {
+                        return sortDirection[column]
+                            ? aVal.localeCompare(bVal)
+                            : bVal.localeCompare(aVal);
+                    }
+
+                    // NUMBER SORT for all other columns
+                    const aNum = parseFloat(aVal) || 0;
+                    const bNum = parseFloat(bVal) || 0;
+
+                    return sortDirection[column]
+                        ? aNum - bNum
+                        : bNum - aNum;
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+
+        clearBtn.addEventListener("click", () => {
+            headers.forEach(h => h.innerHTML = h.innerHTML.replace(" ▲", "").replace(" ▼", ""));
+            sortDirection = {};
+            originalRows.forEach(row => tbody.appendChild(row));
+        });
+    });
+</script>

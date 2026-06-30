@@ -1,3 +1,4 @@
+@model List<HonoursProject.Models.LeaderboardEntry>
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Dashboard";
@@ -5,7 +6,7 @@
 
 <div class="dashboard-container">
     <!-- Header -->
-    <h1 class="dashboard-title">Welcome back, User</h1>
+    <h1 class="dashboard-title">Welcome back, @ViewBag.Username</h1>
     <p class="dashboard-subtitle">Here’s your learning overview</p>
 
     <!-- Continue Learning Card -->
@@ -15,6 +16,9 @@
         ButtonText = "Resume Lesson →",
         ButtonUrl = Url.Action("LessonPage", "Lesson")
     })
+
+    <!-- Leaderboard Card (moved ABOVE the stat grid) -->
+    @await Html.PartialAsync("_Leaderboard", Model)
 
     <!-- Grid Layout -->
     <div class="dashboard-grid">
@@ -28,6 +32,7 @@
                 ")
             })
         </a>
+
         <!-- Achievements Earned (entire card clickable) -->
         <a href="@Url.Action("AchievementsPage", "Account", new { from = "dashboard" })" class="app-card-link-wrapper">
             @await Html.PartialAsync("_Card", new CardViewModel {
@@ -38,6 +43,7 @@
                 ")
             })
         </a>
+
         <!-- Current Streak (not clickable) -->
         @await Html.PartialAsync("_Card", new CardViewModel {
             Variant = "app-card-stat",
@@ -46,9 +52,7 @@
                 <div class='stat-label'>Day Streak</div>
             ")
         })
-
     </div>
-
 
     <!-- Recommended Lessons -->
     @await Html.PartialAsync("_Card", new CardViewModel {
