@@ -17,7 +17,6 @@ public class LessonController : Controller
         if (username == null)
             return RedirectToAction("LoginPage", "Account");
 
-        // ✔ FIX: Load lessons dynamically
         var lessons = await _lessonService.GetAllLessonsAsync();
         return View(lessons);
     }
@@ -28,16 +27,16 @@ public class LessonController : Controller
         if (username == null)
             return RedirectToAction("LoginPage", "Account");
 
-        // ✔ Load the lesson from the database
         var lesson = await _lessonService.GetLessonByIdAsync(id);
 
         if (lesson == null)
             return NotFound();
 
-        // ✔ Pass the lesson model into LessonPage.cshtml
         return View("LessonPage", lesson);
     }
-    public async Task<IActionResult> Start(int id)
+
+    // ⭐ This is the ONLY Start() method you need
+    public async Task<IActionResult> Start(int id, int index = 0)
     {
         var username = HttpContext.Session.GetString("username");
         if (username == null)
@@ -45,13 +44,26 @@ public class LessonController : Controller
 
         var questions = await _lessonService.GetQuestionsForLessonAsync(id);
 
+        if (index < 0 || index >= questions.Count)
+            index = 0;
+
+        ViewBag.Index = index;
         return View("LessonRunner", questions);
     }
 
-
+    // Optional: your Index() method
     public async Task<IActionResult> Index()
     {
         var lessons = await _lessonService.GetAllLessonsAsync();
         return View(lessons);
+    }
+
+    public IActionResult Complete()
+    {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+            return RedirectToAction("LoginPage", "Account");
+
+        return View();
     }
 }

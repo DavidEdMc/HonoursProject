@@ -2,20 +2,88 @@
 
 @{
     Layout = "_Layout";
+    int currentIndex = ViewBag.Index;
+    var question = Model[currentIndex]; 
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/DragDropMatch.css" />
+    <link rel="stylesheet" href="~/css/Ordering.css" />
+    <link rel="stylesheet" href="~/css/FillBlank.css" />
+    <link rel="stylesheet" href="~/css/SpotError.css" />
 }
 
-<h1>Lesson Questions</h1>
+<div class="lesson-runner-container">
 
-@foreach (var q in Model)
-{
+    <h2>Question @(currentIndex + 1) of @Model.Count</h2>
+
     <div class="question-block">
-        <h3>@q.question_text (@q.question_type)</h3>
+        <h3>@question.question_text</h3>
 
-        <ul>
-            @foreach (var opt in q.Options)
-            {
-                <li>@opt.option_text</li>
-            }
-        </ul>
+        @if (question.question_type == "multiple_choice")
+        {
+            <div class="mcq-options">
+                @foreach (var opt in question.Options)
+                {
+                    <button class="mcq-option"
+                            onclick="selectOption('@opt.id', '@(opt.is_correct)')">
+                        @opt.option_text
+                    </button>
+                }
+            </div>
+        }
+        else if (question.question_type == "drag_drop_match")
+        {
+            @await Html.PartialAsync("Partials/_DragDropMatch", question)
+        }
+        else if (question.question_type == "ordering")
+        {
+            @await Html.PartialAsync("Partials/_Ordering", question)
+        }
+        else if (question.question_type == "fill_blank")
+        {
+            @await Html.PartialAsync("Partials/_FillBlank", question)
+        }
+        else if (question.question_type == "spot_error")
+        {
+            @await Html.PartialAsync("Partials/_SpotError", question)
+        }
+        else
+        {
+            <p>Unsupported question type: @question.question_type</p>
+        }
     </div>
-}
+
+    <div id="feedback" class="feedback"></div>
+
+    <button id="nextBtn" class="btn btn-lesson" style="display:none;" onclick="nextQuestion()">
+        Next Question
+    </button>
+
+</div>
+
+<script>
+    let currentIndex = @ViewBag.Index;
+    let totalQuestions = @Model.Count;
+
+    function selectOption(optionId, isCorrect) {
+        const feedback = document.getElementById("feedback");
+
+        if (isCorrect === "True") {
+            feedback.innerHTML = "<span class='correct'>Correct!</span>";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
+        }
+
+        document.getElementById("nextBtn").style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+
+        if (currentIndex < totalQuestions) {
+            window.location.href = `/Lesson/Start/@Model[0].lesson_id?index=${currentIndex}`;
+        } else {
+            window.location.href = "/Lesson/Complete";
+        }
+    }
+</script>

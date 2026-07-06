@@ -1,0 +1,17 @@
+.spoterror-container {
+    margin-top: 20px;
+}
+
+.spoterror-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.spoterror-option {
+    padding: 12px;
+    background: #ffe0e0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+}

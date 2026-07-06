@@ -1,0 +1,17 @@
+.ordering-container {
+    margin-top: 20px;
+}
+
+.ordering-list {
+    list-style: none;
+    padding: 0;
+}
+
+.ordering-item {
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #e0ffe0;
+    border: 1px solid #ccc;
+    cursor: grab;
+    border-radius: 5px;
+}

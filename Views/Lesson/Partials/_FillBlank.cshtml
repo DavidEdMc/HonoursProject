@@ -1,0 +1,47 @@
+@model HonoursProject.Models.Question
+
+@{
+    // For fill-in-the-blank, assume one correct answer stored in options
+    var correctAnswer = Model.Options.FirstOrDefault()?.option_text?.Trim() ?? "";
+}
+
+<div class="fillblank-container">
+    <p>Type your answer below:</p>
+
+    <input id="fillInput"
+           type="text"
+           class="fillblank-input"
+           placeholder="Enter your answer..." />
+
+    <button class="btn btn-lesson" onclick="checkFillBlank()">Submit</button>
+</div>
+
+<div id="fillFeedback" class="feedback"></div>
+
+<button id="fillNextBtn"
+        class="btn btn-lesson"
+        style="display:none;"
+        onclick="nextQuestion()">
+    Next Question
+</button>
+
+<script>
+    const correctAnswer = "@correctAnswer".toLowerCase();
+
+    function checkFillBlank() {
+        const userAnswer = document.getElementById("fillInput").value.trim().toLowerCase();
+        const feedback = document.getElementById("fillFeedback");
+
+        if (userAnswer === "") {
+            feedback.innerHTML = "<span class='incorrect'>Please enter an answer.</span>";
+            return;
+        }
+
+        if (userAnswer === correctAnswer) {
+            feedback.innerHTML = "<span class='correct'>Correct!</span>";
+            document.getElementById("fillNextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
+        }
+    }
+</script>
