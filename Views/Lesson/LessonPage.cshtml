@@ -1,6 +1,8 @@
+@model HonoursProject.Models.Lesson
+
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Lesson";
+    ViewData["Title"] = Model.title;
 }
 
 <div class="lesson-page-container">
@@ -8,24 +10,23 @@
     @await Html.PartialAsync("_BackToLessonsButton")
 
     <div class="lesson-header">
-        <h1 class="lesson-title">Lesson Title Placeholder</h1>
-        <p class="lesson-subtitle">A brief description of what this lesson covers</p>
+        <h1 class="lesson-title">@Model.title</h1>
+        <p class="lesson-subtitle">@Model.description</p>
     </div>
 
     <hr />
 
     <div class="lesson-content">
-        <h2>Section Title</h2>
+        <h2>Lesson Overview</h2>
         <p>
-            This is placeholder lesson content. You can replace this with text, images, 
-            diagrams, videos, or interactive elements later.
+            This is placeholder lesson content. Interactive questions will appear here
+            once the lesson runner is implemented.
         </p>
 
         <img src="~/images/duck-minimalist.png" class="lesson-mascot" alt="Mascot" />
 
         <p>
-            Add more content here to build out the lesson structure. This page is designed 
-            to be flexible and expandable.
+            Click below to begin the interactive lesson.
         </p>
     </div>
 

@@ -1,27 +1,46 @@
+using HonoursProject.Services;
+using HonoursProject.Models;
 using Microsoft.AspNetCore.Mvc;
+
 public class LessonController : Controller
 {
-    public IActionResult LessonSelectionPage()
+    private readonly LessonService _lessonService;
+
+    public LessonController(LessonService lessonService)
+    {
+        _lessonService = lessonService;
+    }
+
+    public async Task<IActionResult> LessonSelectionPage()
     {
         var username = HttpContext.Session.GetString("username");
         if (username == null)
-        {
             return RedirectToAction("LoginPage", "Account");
-        }
 
-        return View();
+        // ✔ FIX: Load lessons dynamically
+        var lessons = await _lessonService.GetAllLessonsAsync();
+        return View(lessons);
     }
 
-
-    public IActionResult LessonPage()
+    public async Task<IActionResult> View(int id)
     {
         var username = HttpContext.Session.GetString("username");
         if (username == null)
-        {
             return RedirectToAction("LoginPage", "Account");
-        }
-        
-        return View();
+
+        // ✔ Load the lesson from the database
+        var lesson = await _lessonService.GetLessonByIdAsync(id);
+
+        if (lesson == null)
+            return NotFound();
+
+        // ✔ Pass the lesson model into LessonPage.cshtml
+        return View("LessonPage", lesson);
     }
 
+    public async Task<IActionResult> Index()
+    {
+        var lessons = await _lessonService.GetAllLessonsAsync();
+        return View(lessons);
+    }
 }

@@ -11,6 +11,7 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LessonService>();
 builder.Services.AddSession();
 
 var app = builder.Build();

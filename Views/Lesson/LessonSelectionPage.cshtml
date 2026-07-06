@@ -1,3 +1,5 @@
+@model List<HonoursProject.Models.Lesson>
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Select a Lesson";
@@ -10,32 +12,17 @@
 
     <div class="lesson-grid">
 
-       @await Html.PartialAsync("_Card", new CardViewModel {
-            Title = "Lesson 1: Introduction",
-            Subtitle = "A gentle introduction to the basics.",
-            ImageUrl = "/images/duck-minimalist.png",
-            ButtonText = "Start Lesson",
-            ButtonUrl = Url.Action("LessonPage", "Lesson")
-        })
+        @foreach (var lesson in Model)
+        {
+            @await Html.PartialAsync("_Card", new CardViewModel {
+                Title = lesson.title,
+                Subtitle = lesson.description,
+                ImageUrl = "/images/duck-minimalist.png",
+                ButtonText = "Start Lesson",
+                ButtonUrl = Url.Action("View", "Lesson", new { id = lesson.id })
+            })
+        }
 
-
-
-        @await Html.PartialAsync("_Card", new CardViewModel {
-            Title = "Lesson 2: Intermediate Concepts",
-            Subtitle = "Build on what you've learned.",
-            ImageUrl = "/images/duck-minimalist.png",
-            ButtonText = "Start Lesson",
-            ButtonUrl = Url.Action("LessonPage", "Lesson")
-        })
-
-
-        @await Html.PartialAsync("_Card", new CardViewModel {
-            Title = "Lesson 3: Advanced Topics",
-            Subtitle = "Challenge yourself with deeper material.",
-            ImageUrl = "/images/duck-minimalist.png",
-            ButtonText = "Start Lesson",
-            ButtonUrl = Url.Action("LessonPage", "Lesson")
-        })
     </div>
 
 </div>
