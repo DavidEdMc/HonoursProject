@@ -1,0 +1,21 @@
+@model List<HonoursProject.Models.Question>
+
+@{
+    Layout = "_Layout";
+}
+
+<h1>Lesson Questions</h1>
+
+@foreach (var q in Model)
+{
+    <div class="question-block">
+        <h3>@q.question_text (@q.question_type)</h3>
+
+        <ul>
+            @foreach (var opt in q.Options)
+            {
+                <li>@opt.option_text</li>
+            }
+        </ul>
+    </div>
+}

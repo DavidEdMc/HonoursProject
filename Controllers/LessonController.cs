@@ -37,6 +37,17 @@ public class LessonController : Controller
         // ✔ Pass the lesson model into LessonPage.cshtml
         return View("LessonPage", lesson);
     }
+    public async Task<IActionResult> Start(int id)
+    {
+        var username = HttpContext.Session.GetString("username");
+        if (username == null)
+            return RedirectToAction("LoginPage", "Account");
+
+        var questions = await _lessonService.GetQuestionsForLessonAsync(id);
+
+        return View("LessonRunner", questions);
+    }
+
 
     public async Task<IActionResult> Index()
     {
