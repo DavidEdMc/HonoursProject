@@ -4,32 +4,91 @@
     margin-top: 20px;
 }
 
-.drag-drop-left, .drag-drop-right {
+/* Left and right columns */
+.drag-drop-left,
+.drag-drop-right {
     width: 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
+/* Drop zones — styled like MCQ buttons */
 .drop-zone {
-    border: 2px dashed #aaa;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 14px 18px;
+    background: #f7f7f7;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
     min-height: 50px;
-    background: #f9f9f9;
+    transition: all 0.2s ease;
 }
 
+/* Hover effect — same as MCQ */
+.drop-zone:hover {
+    background: #fafafa;
+    border-color: #bbb;
+}
+
+/* Drag items — styled like MCQ buttons */
 .drag-item {
-    padding: 10px;
-    background: #e0e0ff;
-    margin-bottom: 10px;
+    padding: 14px 18px;
+    background: #f7f7f7;
+    border: 2px solid #ddd;
+    border-radius: 8px;
     cursor: grab;
-    border-radius: 5px;
+    transition: all 0.2s ease;
 }
 
+/* Hover effect — same as MCQ */
+.drag-item:hover {
+    background: #fafafa;
+    border-color: #bbb;
+}
+
+/* Dragging visual feedback */
+.drag-item:active {
+    cursor: grabbing;
+    background: #eef5ff;
+    border-color: #4a90e2;
+}
+
+/* Feedback colours (global classes) */
 .correct {
-    color: green;
+    color: #4caf50;
     font-weight: bold;
 }
 
 .incorrect {
-    color: red;
+    color: #e53935;
     font-weight: bold;
 }
+
+/* Correct drop-zone */
+.drop-zone.correct {
+    background: #d4f8d4;
+    border-color: #4caf50;
+}
+
+/* Incorrect drop-zone */
+.drop-zone.incorrect {
+    background: #ffe0e0;
+    border-color: #e53935;
+}
+
+.drop-zone.filled {
+    background: #eef5ff;
+    border-color: #4a90e2;
+}
+
+.draggable.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.drop-zone.disabled {
+    background: #f0f0f0;
+    border-color: #ccc;
+}
+
+
+

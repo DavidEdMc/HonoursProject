@@ -1,15 +1,11 @@
 @model HonoursProject.Models.Question
 
 @{
-    // Group options by match_key
     var groups = Model.Options
         .GroupBy(o => o.match_key)
         .ToDictionary(g => g.Key, g => g.ToList());
 
-    // Left side: prompts (first item in each group)
     var prompts = groups.Select(g => g.Value.First()).ToList();
-
-    // Right side: draggable answers (second item in each group)
     var answers = groups.Select(g => g.Value.Last()).OrderBy(a => a.order_position).ToList();
 }
 
@@ -37,43 +33,38 @@
 
 </div>
 
-<div id="dragFeedback" class="feedback"></div>
-<button id="dragNextBtn" class="btn btn-lesson" style="display:none;" onclick="nextQuestion()">
-    Next Question
-</button>
-
 <script>
+    let userMatches = {};
+
     const dropZones = document.querySelectorAll('.drop-zone');
     const dragItems = document.querySelectorAll('.drag-item');
-    let correctMatches = 0;
+
+    function handleDragStart(e) {
+        e.dataTransfer.setData('key', e.target.dataset.key);
+        e.dataTransfer.setData('text', e.target.innerText);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        const draggedKey = e.dataTransfer.getData('key');
+        const draggedText = e.dataTransfer.getData('text');
+
+        userMatches[e.target.dataset.key] = draggedKey;
+
+        e.target.innerHTML = `<span class="drop-text">${draggedText}</span>`;
+        e.target.classList.add("filled");
+    }
 
     dragItems.forEach(item => {
-        item.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('key', item.dataset.key);
-            e.dataTransfer.setData('text', item.innerText);
-        });
+        item.addEventListener('dragstart', handleDragStart);
     });
 
     dropZones.forEach(zone => {
-        zone.addEventListener('dragover', e => e.preventDefault());
-
-        zone.addEventListener('drop', e => {
-            const draggedKey = e.dataTransfer.getData('key');
-            const draggedText = e.dataTransfer.getData('text');
-
-            if (draggedKey === zone.dataset.key) {
-                zone.innerHTML = `<span class='correct'>${draggedText}</span>`;
-                correctMatches++;
-
-                if (correctMatches === dropZones.length) {
-                    document.getElementById("dragFeedback").innerHTML =
-                        "<span class='correct'>All matches correct!</span>";
-                    document.getElementById("dragNextBtn").style.display = "block";
-                }
-            } else {
-                document.getElementById("dragFeedback").innerHTML =
-                    "<span class='incorrect'>Incorrect match!</span>";
-            }
-        });
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('drop', handleDrop);
     });
 </script>
+

@@ -6,6 +6,7 @@
     var question = Model[currentIndex]; 
 }
 @section Styles {
+    <link rel="stylesheet" href="~/css/MCQ.css" />
     <link rel="stylesheet" href="~/css/DragDropMatch.css" />
     <link rel="stylesheet" href="~/css/Ordering.css" />
     <link rel="stylesheet" href="~/css/FillBlank.css" />
@@ -55,26 +56,269 @@
 
     <div id="feedback" class="feedback"></div>
 
-    <button id="nextBtn" class="btn btn-lesson" style="display:none;" onclick="nextQuestion()">
-        Next Question
-    </button>
+    <span class="button-wrapper">
+        <button id="submitBtn" class="btn btn-lesson" onclick="submitAnswer()">
+            Submit
+        </button>
+        <button id="nextBtn" class="btn btn-lesson" style="display:none;" onclick="nextQuestion()">
+            Next Question
+        </button>
+    </span>
 
 </div>
 
 <script>
     let currentIndex = @ViewBag.Index;
     let totalQuestions = @Model.Count;
+    let selectedOptionId = null;
+    let selectedOptionIsCorrect = null;
 
     function selectOption(optionId, isCorrect) {
-        const feedback = document.getElementById("feedback");
+        const btn = document.querySelector(`button[onclick*="${optionId}"]`);
 
-        if (isCorrect === "True") {
-            feedback.innerHTML = "<span class='correct'>Correct!</span>";
-        } else {
-            feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
+        // MCQ: single-select behaviour
+        if (btn.classList.contains("mcq-option")) {
+
+            // Clear correctness + selected styling on ALL MCQ options
+            document.querySelectorAll('.mcq-option').forEach(b => {
+                b.classList.remove('correct', 'incorrect', 'selected');
+            });
+
+            // Store selection
+            selectedOptionId = optionId;
+            selectedOptionIsCorrect = isCorrect;
+
+            // Apply selected highlight
+            btn.classList.add('selected');
+            return;
         }
 
-        document.getElementById("nextBtn").style.display = "block";
+        // SpotError: multi-select toggle behaviour
+        if (btn.classList.contains("spoterror-option")) {
+
+            // Always remove correctness styling when user interacts again
+            btn.classList.remove("correct", "incorrect");
+
+            // Toggle selection
+            if (btn.classList.contains("selected")) {
+                btn.classList.remove("selected");
+                btn.dataset.selected = "false";
+            } else {
+                btn.classList.add("selected");
+                btn.dataset.selected = "true";
+            }
+        }
+    }
+
+    function submitAnswer() {
+        const type = "@question.question_type";
+
+        if (type === "multiple_choice") {
+            validateMCQ();
+        }
+        else if (type === "spot_error") {
+            validateSpotError();
+        }
+        else if (type === "ordering") {
+            validateOrdering();
+        }
+        else if (type === "fill_blank") {
+            validateFillBlank();
+        }
+        else if (type === "drag_drop_match") {
+            validateDragDropMatch();
+        }
+    }
+
+    function validateMCQ() {
+        const feedback = document.getElementById("feedback");
+
+        if (!selectedOptionId) {
+            feedback.innerHTML = "<span class='incorrect'>Please select an option.</span>";
+            return;
+        }
+
+        const clickedBtn = document.querySelector(`button[onclick*="${selectedOptionId}"]`);
+
+        // Clear previous correctness styling
+        document.querySelectorAll('.mcq-option').forEach(b => {
+            b.classList.remove('correct', 'incorrect');
+        });
+
+        if (selectedOptionIsCorrect === "True") {
+            feedback.innerHTML = "<span class='correct'>Correct!</span>";
+            clickedBtn.classList.add('correct');
+
+            disableAllAnswers();
+
+            document.getElementById("nextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
+            clickedBtn.classList.add('incorrect');
+            document.getElementById("nextBtn").style.display = "none";
+        }
+
+    }
+
+    function validateSpotError() {
+        const feedback = document.getElementById("feedback");
+
+        const options = document.querySelectorAll(".spoterror-option");
+        let anySelected = false;
+        let allSelectedAreCorrect = true;
+        let allCorrectAreSelected = true;
+
+        // Remove previous styling (but DO NOT clear dataset.selected yet)
+        options.forEach(opt => {
+            opt.classList.remove("correct", "incorrect");
+            opt.classList.remove("selected");
+        });
+
+        // First pass: evaluate selected items
+        options.forEach(opt => {
+            const isSelected = opt.dataset.selected === "true";
+            const isCorrect = opt.getAttribute("onclick").includes("False");
+
+            if (isSelected) {
+                anySelected = true;
+
+                if (isCorrect) {
+                    opt.classList.add("correct");
+                } else {
+                    opt.classList.add("incorrect");
+                    allSelectedAreCorrect = false;
+                }
+            }
+        });
+
+        // Second pass: ensure ALL incorrect statements were selected
+        options.forEach(opt => {
+            const isCorrect = opt.getAttribute("onclick").includes("False");
+            const isSelected = opt.dataset.selected === "true";
+
+            if (isCorrect && !isSelected) {
+                allCorrectAreSelected = false;
+            }
+        });
+
+        if (!anySelected) {
+            feedback.innerHTML = "<span class='incorrect'>Please select at least one statement.</span>";
+            return;
+        }
+
+        if (allSelectedAreCorrect && allCorrectAreSelected) {
+            feedback.innerHTML = "<span class='correct'>Correct — all incorrect statements were selected.</span>";
+
+            disableAllAnswers();
+
+            document.getElementById("nextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>You must select ALL incorrect statements and no correct ones.</span>";
+        }
+
+
+        // clear selection state AFTER evaluation
+        options.forEach(opt => {
+            opt.dataset.selected = "false";
+        });
+    }
+
+    function validateOrdering() {
+        const items = document.querySelectorAll(".ordering-item");
+        const feedback = document.getElementById("feedback");
+
+        let allCorrect = true;
+
+        items.forEach((item, index) => {
+            const correctPos = parseInt(item.dataset.order);
+
+            // Remove previous styling
+            item.classList.remove("correct", "incorrect");
+
+            if (correctPos === index + 1) {
+                item.classList.add("correct");
+            } else {
+                item.classList.add("incorrect");
+                allCorrect = false;
+            }
+        });
+
+        if (allCorrect) {
+            feedback.innerHTML = "<span class='correct'>Correct order!</span>";
+
+            disableAllAnswers();
+
+            document.getElementById("nextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Some items are in the wrong order.</span>";
+        }
+
+    }
+
+    function validateFillBlank() {
+        const input = document.getElementById("fillInput");
+        const feedback = document.getElementById("feedback");
+
+        const userAnswer = input.value.trim().toLowerCase();
+        const correctAnswer = "@question.Options.FirstOrDefault()?.option_text".toLowerCase();
+
+        // Remove previous styling
+        input.classList.remove("correct", "incorrect");
+
+        if (userAnswer === "") {
+            feedback.innerHTML = "<span class='incorrect'>Please enter an answer.</span>";
+            return;
+        }
+
+        if (userAnswer === correctAnswer) {
+            feedback.innerHTML = "<span class='correct'>Correct!</span>";
+            input.classList.add("correct");
+
+            disableAllAnswers();
+
+            document.getElementById("nextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
+            input.classList.add("incorrect");
+        }
+    }
+
+    function validateDragDropMatch() {
+        const feedback = document.getElementById("feedback");
+
+        const zones = document.querySelectorAll(".drop-zone");
+        let allCorrect = true;
+
+        zones.forEach(zone => {
+            const correctKey = zone.dataset.key;
+            const userKey = userMatches[correctKey];
+
+            // Remove previous styling
+            zone.classList.remove("correct", "incorrect");
+            zone.classList.remove("filled");
+
+            if (userKey === correctKey) {
+                zone.classList.add("correct");
+            } else {
+                zone.classList.add("incorrect");
+                allCorrect = false;
+            }
+        });
+
+        if (Object.keys(userMatches).length === 0) {
+            feedback.innerHTML = "<span class='incorrect'>Please complete all matches.</span>";
+            return;
+        }
+
+        if (allCorrect) {
+            feedback.innerHTML = "<span class='correct'>All matches correct!</span>";
+
+            disableAllAnswers();
+
+            document.getElementById("nextBtn").style.display = "block";
+        } else {
+            feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect. Try again.</span>";
+        }
     }
 
     function nextQuestion() {
@@ -86,4 +330,48 @@
             window.location.href = "/Lesson/Complete";
         }
     }
+
+    function disableAllAnswers() {
+        // MCQ
+        document.querySelectorAll('.mcq-option').forEach(btn => {
+            btn.disabled = true;
+        });
+
+        // SpotError
+        document.querySelectorAll('.spoterror-option').forEach(btn => {
+            btn.disabled = true;
+        });
+
+        // Ordering
+        document.querySelectorAll('.ordering-item').forEach(item => {
+            item.setAttribute("draggable", false);
+        });
+
+        // FillBlank
+        const fillInput = document.getElementById("fillInput");
+        if (fillInput) fillInput.disabled = true;
+
+        // DragDropMatch
+        document.querySelectorAll('.draggable').forEach(d => {
+            d.setAttribute("draggable", false);
+
+            // Remove drag event listeners
+            d.removeEventListener("dragstart", handleDragStart);
+            d.removeEventListener("dragend", handleDragEnd);
+
+            // Add a disabled class for styling (optional)
+            d.classList.add("disabled");
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            // Prevent dropping
+            zone.removeEventListener("dragover", handleDragOver);
+            zone.removeEventListener("drop", handleDrop);
+
+            // Optional: visually indicate disabled
+            zone.classList.add("disabled");
+        });
+    }
+
 </script>
+

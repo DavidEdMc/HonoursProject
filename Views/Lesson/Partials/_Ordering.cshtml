@@ -1,14 +1,12 @@
 @model HonoursProject.Models.Question
 
 @{
-    // Shuffle items randomly for display
     var shuffled = Model.Options
         .OrderBy(o => Guid.NewGuid())
         .ToList();
 }
 
 <div class="ordering-container">
-
     <p>Drag the items into the correct order:</p>
 
     <ul id="orderingList" class="ordering-list">
@@ -22,17 +20,7 @@
             </li>
         }
     </ul>
-
 </div>
-
-<div id="orderingFeedback" class="feedback"></div>
-
-<button id="orderingNextBtn"
-        class="btn btn-lesson"
-        style="display:none;"
-        onclick="nextQuestion()">
-    Next Question
-</button>
 
 <script>
     const list = document.getElementById("orderingList");
@@ -53,28 +41,5 @@
         }
     });
 
-    list.addEventListener("drop", e => {
-        checkOrder();
-    });
-
-    function checkOrder() {
-        const items = document.querySelectorAll(".ordering-item");
-        let correct = true;
-
-        items.forEach((item, index) => {
-            const correctPos = parseInt(item.dataset.order);
-            if (correctPos !== index + 1) {
-                correct = false;
-            }
-        });
-
-        const feedback = document.getElementById("orderingFeedback");
-
-        if (correct) {
-            feedback.innerHTML = "<span class='correct'>Correct order!</span>";
-            document.getElementById("orderingNextBtn").style.display = "block";
-        } else {
-            feedback.innerHTML = "<span class='incorrect'>Incorrect order. Try again.</span>";
-        }
-    }
+    // No validation here — LessonRunner handles it
 </script>

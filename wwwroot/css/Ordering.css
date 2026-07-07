@@ -5,13 +5,49 @@
 .ordering-list {
     list-style: none;
     padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
+/* Base item styling — matches MCQ buttons */
 .ordering-item {
-    padding: 12px;
-    margin-bottom: 10px;
-    background: #e0ffe0;
-    border: 1px solid #ccc;
+    padding: 14px 18px;
+    background: #f7f7f7;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
     cursor: grab;
-    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect — same as MCQ */
+.ordering-item:hover {
+    background: #fafafa;
+    border-color: #bbb;
+}
+
+/* Dragging visual feedback */
+.ordering-item:active {
+    cursor: grabbing;
+    background: #eef5ff;
+    border-color: #4a90e2;
+}
+
+.ordering-item:active {
+    background: #eef5ff;
+    border-color: #4a90e2;
+}
+
+/* Correct item */
+.ordering-item.correct {
+    background: #d4f8d4;
+    border-color: #4caf50;
+}
+
+/* Incorrect item */
+.ordering-item.incorrect {
+    background: #ffe0e0;
+    border-color: #e53935;
 }

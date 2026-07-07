@@ -1,0 +1,48 @@
+.mcq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.mcq-option {
+    padding: 14px 18px;
+    background: #f7f7f7;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.mcq-option:hover {
+    background: #fafafa;
+    border-color: #bbb;
+}
+
+/* Selected state (JS will add this class) */
+.mcq-option.selected {
+    background: #e6f0ff;
+    border-color: #4a90e2;
+}
+
+/* Correct state */
+.mcq-option.correct {
+    background: #d4f8d4;
+    border-color: #4caf50;
+}
+
+/* Incorrect state */
+.mcq-option.incorrect {
+    background: #ffe0e0;
+    border-color: #e53935;
+}
+
+.button-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}

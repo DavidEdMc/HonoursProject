@@ -7,32 +7,9 @@
         @foreach (var opt in Model.Options)
         {
             <button class="spoterror-option"
-                    onclick="checkSpotError('@opt.id', '@(opt.is_correct)')">
+                    onclick="selectOption('@opt.id', '@(opt.is_correct)')">
                 @opt.option_text
             </button>
         }
     </div>
 </div>
-
-<div id="spotErrorFeedback" class="feedback"></div>
-
-<button id="spotErrorNextBtn"
-        class="btn btn-lesson"
-        style="display:none;"
-        onclick="nextQuestion()">
-    Next Question
-</button>
-
-<script>
-    function checkSpotError(optionId, isCorrect) {
-        const feedback = document.getElementById("spotErrorFeedback");
-
-        // Spot error: the incorrect option is the correct answer
-        if (isCorrect === "False") {
-            feedback.innerHTML = "<span class='correct'>Correct — that statement is incorrect.</span>";
-            document.getElementById("spotErrorNextBtn").style.display = "block";
-        } else {
-            feedback.innerHTML = "<span class='incorrect'>Incorrect — that statement is actually correct.</span>";
-        }
-    }
-</script>
