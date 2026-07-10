@@ -35,7 +35,6 @@ public class LessonController : Controller
         return View("LessonPage", lesson);
     }
 
-    // ⭐ This is the ONLY Start() method you need
     public async Task<IActionResult> Start(int id, int index = 0)
     {
         var username = HttpContext.Session.GetString("username");
@@ -51,7 +50,6 @@ public class LessonController : Controller
         return View("LessonRunner", questions);
     }
 
-    // Optional: your Index() method
     public async Task<IActionResult> Index()
     {
         var lessons = await _lessonService.GetAllLessonsAsync();

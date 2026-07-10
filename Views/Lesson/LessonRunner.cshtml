@@ -16,6 +16,13 @@
 <div class="lesson-runner-container">
 
     <h2>Question @(currentIndex + 1) of @Model.Count</h2>
+    <div id="lessonCompleteBanner" class="lesson-complete-banner">
+        Lesson Complete!
+    </div>
+
+    <div id="lessonProgressWrapper">
+        <div id="lessonProgressBar"></div>
+    </div>
 
     <div class="question-block">
         <h3>@question.question_text</h3>
@@ -325,9 +332,27 @@
         currentIndex++;
 
         if (currentIndex < totalQuestions) {
+            // Normal navigation
             window.location.href = `/Lesson/Start/@Model[0].lesson_id?index=${currentIndex}`;
-        } else {
-            window.location.href = "/Lesson/Complete";
+        } 
+        else {
+            // Completion animation
+            const bar = document.getElementById("lessonProgressBar");
+            const banner = document.getElementById("lessonCompleteBanner");
+
+            // Fill bar to 100%
+            bar.style.width = "100%";
+
+            // Pulse animation
+            bar.style.animation = "progressPulse 0.8s ease-in-out 2";
+
+            // Show banner
+            banner.classList.add("show");
+
+            // Redirect after animation
+            setTimeout(() => {
+                window.location.href = "/Lesson/Complete";
+            }, 1200);
         }
     }
 
@@ -373,5 +398,11 @@
         });
     }
 
-</script>
+    function updateProgressBar() {
+        const progress = ((currentIndex + 1) / totalQuestions) * 100;
+        document.getElementById("lessonProgressBar").style.width = progress + "%";
+    }
 
+    updateProgressBar();
+
+</script>
