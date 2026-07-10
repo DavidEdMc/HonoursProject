@@ -28,9 +28,24 @@ public class LessonController : Controller
             return RedirectToAction("LoginPage", "Account");
 
         var lesson = await _lessonService.GetLessonByIdAsync(id);
-
         if (lesson == null)
             return NotFound();
+
+        // Get all lessons so we can find previous/next
+        var lessons = await _lessonService.GetAllLessonsAsync();
+
+        // Sort by order_index
+        lessons = lessons.OrderBy(l => l.order_index).ToList();
+
+        // Find current index
+        int currentIndex = lessons.FindIndex(l => l.id == id);
+
+        // Determine previous and next
+        int? previousId = currentIndex > 0 ? lessons[currentIndex - 1].id : null;
+        int? nextId = currentIndex < lessons.Count - 1 ? lessons[currentIndex + 1].id : null;
+
+        ViewBag.PreviousId = previousId;
+        ViewBag.NextId = nextId;
 
         return View("LessonPage", lesson);
     }

@@ -37,8 +37,28 @@
     </a>
 
     <div class="lesson-navigation">
-        <a class="btn btn-lesson" href="#">Previous</a>
-        <a class="btn btn-lesson" href="#">Next</a>
+        @if (ViewBag.PreviousId != null)
+        {
+            <a class="btn btn-lesson" href="@Url.Action("View", "Lesson", new { id = ViewBag.PreviousId })">
+                Previous
+            </a>
+        }
+        else
+        {
+            <span></span> <!-- keeps spacing -->
+        }
+
+        @if (ViewBag.NextId != null)
+        {
+            <a class="btn btn-lesson" href="@Url.Action("View", "Lesson", new { id = ViewBag.NextId })">
+                Next
+            </a>
+        }
+        else
+        {
+            <span></span>
+        }
     </div>
+
 
 </div>
