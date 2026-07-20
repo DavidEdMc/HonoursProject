@@ -130,13 +130,19 @@ namespace HonoursProject.Services
 
         public void CreateUser(User user)
         {
-            string query = @"INSERT INTO tb_users (username, email_address, password, profile_picture)
-                            VALUES (@username, @email, @password, @picture)";
-
             using (var conn = _db.GetConnection())
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand(query, conn))
+
+                long newUserId;
+
+                // 1. Insert user
+                string userQuery = @"
+                    INSERT INTO tb_users (username, email_address, password, profile_picture)
+                    VALUES (@username, @email, @password, @picture);
+                ";
+
+                using (var cmd = new MySqlCommand(userQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@username", user.Username);
                     cmd.Parameters.AddWithValue("@email", user.EmailAddress);
@@ -144,10 +150,25 @@ namespace HonoursProject.Services
                     cmd.Parameters.AddWithValue("@picture", user.ProfilePicture);
 
                     cmd.ExecuteNonQuery();
+
+                    // Capture the new user ID BEFORE leaving the using block
+                    newUserId = cmd.LastInsertedId;
+                }
+
+                // 2. Insert XP row for the new user
+                string xpQuery = @"
+                    INSERT INTO tb_user_xp (user_id, xp)
+                    VALUES (@userId, 0);
+                ";
+
+                using (var xpCmd = new MySqlCommand(xpQuery, conn))
+                {
+                    xpCmd.Parameters.AddWithValue("@userId", newUserId);
+                    xpCmd.ExecuteNonQuery();
                 }
             }
         }
-
+        
         public UserStats GetStatsByUserId(int userId)
         {
             string query = "SELECT * FROM tb_user_stats WHERE user_id = @userId";

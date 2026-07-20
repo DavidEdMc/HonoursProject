@@ -27,7 +27,6 @@ public class AccountController : Controller
             return View("LoginPage");
         }
 
-        // BCrypt verification
         if (!_userService.VerifyPassword(password, user.Password))
         {
             ViewBag.Error = "Invalid username or password";
@@ -37,9 +36,11 @@ public class AccountController : Controller
         // Login success
         HttpContext.Session.SetString("username", user.Username);
         HttpContext.Session.SetString("profile_picture", user.ProfilePicture);
+        HttpContext.Session.SetInt32("user_id", user.Id);
 
         return RedirectToAction("Index", "Home");
     }
+
 
     public IActionResult ForgotPassword()
     {

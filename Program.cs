@@ -12,11 +12,16 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddScoped<DatabaseService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LessonService>();
-builder.Services.AddSession();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -25,7 +30,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseSession();
+app.UseSession();   // this is correct
 
 app.UseAuthorization();
 

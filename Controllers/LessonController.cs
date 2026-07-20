@@ -55,6 +55,9 @@ public class LessonController : Controller
         var username = HttpContext.Session.GetString("username");
         if (username == null)
             return RedirectToAction("LoginPage", "Account");
+        
+        HttpContext.Session.SetString("LessonStartTime", DateTime.UtcNow.ToString());
+        TempData["LessonId"] = id;
 
         var questions = await _lessonService.GetQuestionsForLessonAsync(id);
 
@@ -73,10 +76,96 @@ public class LessonController : Controller
 
     public IActionResult Complete()
     {
-        var username = HttpContext.Session.GetString("username");
-        if (username == null)
+        var userId = HttpContext.Session.GetInt32("user_id");
+        if (userId == null)
             return RedirectToAction("LoginPage", "Account");
 
+        // Retrieve start time
+        var startString = HttpContext.Session.GetString("LessonStartTime");
+
+        // Retrieve lessonId from TempData
+        var lessonIdString = TempData["LessonId"]?.ToString();
+        if (!int.TryParse(lessonIdString, out int lessonId))
+        {
+            HttpContext.Session.Remove("LessonStartTime");
+            return View();
+        }
+
+        // -----------------------------
+        // 1. Calculate duration
+        // -----------------------------
+        int durationSeconds = 0;
+        if (DateTime.TryParse(startString, out var startTime))
+        {
+            var endTime = DateTime.UtcNow;
+            durationSeconds = (int)(endTime - startTime).TotalSeconds;
+        }
+
+        // -----------------------------
+        // 2. Calculate score
+        // -----------------------------
+        int score = _lessonService.CalculateLessonScore(userId.Value, lessonId);
+
+        // -----------------------------
+        // 3. Save lesson history
+        // -----------------------------
+        _lessonService.SaveLessonHistory(userId.Value, lessonId, score, durationSeconds);
+
+        // -----------------------------
+        // 4. Award XP
+        // -----------------------------
+        int xp = score;
+
+        if (durationSeconds < 60) xp += 50;   // speed bonus
+        if (durationSeconds < 30) xp += 100;  // lightning bonus
+
+        _lessonService.AddXp(userId.Value, xp);
+
+        // -----------------------------
+        // 5. Update leaderboard stats
+        // -----------------------------
+        _lessonService.UpdateUserStats(userId.Value, lessonId, score, durationSeconds);
+
+        // -----------------------------
+        // 6. Cleanup
+        // -----------------------------
+        HttpContext.Session.Remove("LessonStartTime");
+
+        // -----------------------------
+        // 7. Pass data to the view
+        // -----------------------------
+        ViewBag.Score = score;
+        ViewBag.Xp = xp;
+        ViewBag.Duration = durationSeconds;
+
         return View();
+    }
+
+    [HttpPost]
+    public IActionResult RecordAttempt([FromBody] QuestionAttemptDto attempt)
+    {
+        var userId = HttpContext.Session.GetInt32("user_id");
+        if (userId == null)
+            return Unauthorized();
+
+        _lessonService.RecordQuestionAttempt(
+            userId.Value,
+            attempt.QuestionId,
+            attempt.OptionId,
+            attempt.IsCorrect,
+            attempt.TimeTakenSeconds,
+            attempt.Attempts
+        );
+
+        return Ok();
+    }
+
+    public class QuestionAttemptDto
+    {
+        public int QuestionId { get; set; }
+        public int OptionId { get; set; }
+        public bool IsCorrect { get; set; }
+        public int TimeTakenSeconds { get; set; }
+        public int Attempts { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace HonoursProject.Services
             {
                 await conn.OpenAsync();
 
-                string query = @"SELECT id, title, description, difficulty, order_index, is_active
+                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path
                                 FROM tb_lessons
                                 ORDER BY order_index";
 
@@ -46,7 +46,8 @@ namespace HonoursProject.Services
                             description = SafeString(reader["description"]),
                             difficulty = SafeString(reader["difficulty"]),
                             order_index = SafeInt(reader["order_index"]),
-                            is_active = SafeInt(reader["is_active"]) == 1
+                            is_active = SafeInt(reader["is_active"]) == 1,
+                            IconPath = SafeString(reader["icon_path"])
                         });
                     }
                 }
@@ -61,7 +62,7 @@ namespace HonoursProject.Services
             {
                 await conn.OpenAsync();
 
-                string query = @"SELECT id, title, description, difficulty, order_index, is_active
+                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path
                                 FROM tb_lessons
                                 WHERE id = @id";
 
@@ -80,7 +81,8 @@ namespace HonoursProject.Services
                                 description = SafeString(reader["description"]),
                                 difficulty = SafeString(reader["difficulty"]),
                                 order_index = SafeInt(reader["order_index"]),
-                                is_active = SafeInt(reader["is_active"]) == 1
+                                is_active = SafeInt(reader["is_active"]) == 1,
+                                IconPath = SafeString(reader["icon_path"])
                             };
                         }
                     }
@@ -172,6 +174,135 @@ namespace HonoursProject.Services
             }
 
             return options;
+        }
+
+        public void RecordQuestionAttempt(int userId, int questionId, int optionId, bool isCorrect, int timeTaken, int attempts)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO tb_user_question_attempts
+                    (user_id, question_id, selected_option_id, is_correct, time_taken_seconds, attempts)
+                    VALUES (@userId, @questionId, @optionId, @isCorrect, @timeTaken, @attempts);
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@questionId", questionId);
+                    cmd.Parameters.AddWithValue("@optionId", optionId);
+                    cmd.Parameters.AddWithValue("@isCorrect", isCorrect ? 1 : 0);
+                    cmd.Parameters.AddWithValue("@timeTaken", timeTaken);
+                    cmd.Parameters.AddWithValue("@attempts", attempts);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public int CalculateLessonScore(int userId, int lessonId)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    SELECT SUM(q.points)
+                    FROM tb_user_question_attempts a
+                    JOIN tb_questions q ON a.question_id = q.id
+                    WHERE a.user_id = @userId AND q.lesson_id = @lessonId AND a.is_correct = 1;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
+
+                    var result = cmd.ExecuteScalar();
+                    return result == DBNull.Value ? 0 : Convert.ToInt32(result);
+                }
+            }
+        }
+
+        public void SaveLessonHistory(int userId, int lessonId, int score, int durationSeconds)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO tb_user_lesson_history
+                    (user_id, lesson_id, score, time_taken_seconds, completed_at)
+                    VALUES (@userId, @lessonId, @score, @duration, @completedAt);
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
+                    cmd.Parameters.AddWithValue("@score", score);
+                    cmd.Parameters.AddWithValue("@duration", durationSeconds);
+                    cmd.Parameters.AddWithValue("@completedAt", DateTime.UtcNow);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void AddXp(int userId, int xp)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    UPDATE tb_user_xp
+                    SET xp = xp + @xp
+                    WHERE user_id = @userId;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@xp", xp);
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateUserStats(int userId, int lessonId, int score, int durationSeconds)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    UPDATE tb_user_stats
+                    SET lessons_completed = lessons_completed + 1,
+                        score = score + @score,
+                        fastest_lesson_seconds = LEAST(fastest_lesson_seconds, @duration),
+                        last_lesson_date = @completedAt,
+                        current_streak = CASE 
+                            WHEN DATE(last_lesson_date) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+                            THEN current_streak + 1
+                            ELSE 1
+                        END,
+                        highest_streak = GREATEST(highest_streak, current_streak)
+                    WHERE user_id = @userId;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@score", score);
+                    cmd.Parameters.AddWithValue("@duration", durationSeconds);
+                    cmd.Parameters.AddWithValue("@completedAt", DateTime.UtcNow);
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

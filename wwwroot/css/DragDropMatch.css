@@ -65,14 +65,14 @@
 
 /* Correct drop-zone */
 .drop-zone.correct {
-    background: #d4f8d4;
-    border-color: #4caf50;
+    background: #d4f8d4 !important;
+    border-color: #4caf50 !important;
 }
 
 /* Incorrect drop-zone */
 .drop-zone.incorrect {
-    background: #ffe0e0;
-    border-color: #e53935;
+    background: #ffe0e0 !important;
+    border-color: #e53935 !important;
 }
 
 .drop-zone.filled {

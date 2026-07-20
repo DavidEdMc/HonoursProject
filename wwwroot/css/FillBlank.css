@@ -5,39 +5,37 @@
     gap: 12px;
 }
 
-/* Input styled like MCQ buttons */
+/* Match login form styling */
 .fillblank-input {
     width: 60%;
     padding: 14px 18px;
     font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    background: #f7f7f7;
-    transition: all 0.2s ease;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background: #ffffff;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-/* Hover/focus effect — matches MCQ hover */
+/* Hover/focus effect */
 .fillblank-input:hover,
 .fillblank-input:focus {
-    background: #fafafa;
-    border-color: #bbb;
-    outline: none;
-}
-
-/* Optional: make the input expand on focus */
-.fillblank-input:focus {
-    background: #f7faff;
+    background: #f9fbff;
     border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 6px rgba(74,144,226,0.4);
 }
 
 /* Correct input */
 .fillblank-input.correct {
     background: #d4f8d4;
     border-color: #4caf50;
+    box-shadow: 0 0 6px rgba(76,175,80,0.4);
 }
 
 /* Incorrect input */
 .fillblank-input.incorrect {
     background: #ffe0e0;
     border-color: #e53935;
+    box-shadow: 0 0 6px rgba(229,57,53,0.4);
 }

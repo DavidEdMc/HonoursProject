@@ -8,5 +8,6 @@ namespace HonoursProject.Models
         public string difficulty { get; set; }
         public int order_index { get; set; }
         public bool is_active { get; set; }
+        public string IconPath { get; set; }
     }
 }

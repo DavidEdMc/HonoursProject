@@ -17,7 +17,7 @@
             @await Html.PartialAsync("_Card", new CardViewModel {
                 Title = lesson.title,
                 Subtitle = lesson.description,
-                ImageUrl = "/images/duck-minimalist.png",
+                ImageUrl = lesson.IconPath,
                 ButtonText = "Start Lesson",
                 ButtonUrl = Url.Action("View", "Lesson", new { id = lesson.id })
             })

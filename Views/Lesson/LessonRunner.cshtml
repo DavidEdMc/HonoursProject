@@ -24,42 +24,7 @@
         <div id="lessonProgressBar"></div>
     </div>
 
-    <div class="question-block">
-        <h3>@question.question_text</h3>
-
-        @if (question.question_type == "multiple_choice")
-        {
-            <div class="mcq-options">
-                @foreach (var opt in question.Options)
-                {
-                    <button class="mcq-option"
-                            onclick="selectOption('@opt.id', '@(opt.is_correct)')">
-                        @opt.option_text
-                    </button>
-                }
-            </div>
-        }
-        else if (question.question_type == "drag_drop_match")
-        {
-            @await Html.PartialAsync("Partials/_DragDropMatch", question)
-        }
-        else if (question.question_type == "ordering")
-        {
-            @await Html.PartialAsync("Partials/_Ordering", question)
-        }
-        else if (question.question_type == "fill_blank")
-        {
-            @await Html.PartialAsync("Partials/_FillBlank", question)
-        }
-        else if (question.question_type == "spot_error")
-        {
-            @await Html.PartialAsync("Partials/_SpotError", question)
-        }
-        else
-        {
-            <p>Unsupported question type: @question.question_type</p>
-        }
-    </div>
+    <div class="question-block" id="questionBlock"></div>
 
     <div id="feedback" class="feedback"></div>
 
@@ -75,13 +40,227 @@
 </div>
 
 <script>
+    function shuffleArray(arr) {
+        return arr
+            .map(value => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value);
+    }
+
+    // shuffle ordering of questions
+    const questions = shuffleArray(
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model))
+    );
+
     let currentIndex = @ViewBag.Index;
-    let totalQuestions = @Model.Count;
+    let totalQuestions = questions.length;
     let selectedOptionId = null;
     let selectedOptionIsCorrect = null;
+    let userMatches = {};
+    let hasSubmitted = false;
+    let currentQuestionId = null;
+    let attemptCount = 0;
+
+
+    function loadQuestion(index) {
+        const q = questions[index];
+        currentQuestionId = q.id;
+        attemptCount = 0;
+        const block = document.getElementById("questionBlock");
+
+        let html = `<h3>${q.question_text}</h3>`;
+
+        if (q.question_type === "multiple_choice") {
+            html += `<div class="mcq-options">`;
+            shuffleArray(q.Options).forEach(opt => {
+                html += `
+                    <button class="mcq-option"
+                        data-id="${opt.id}"
+                        onclick="selectOption(${opt.id}, ${opt.is_correct})">
+                        ${opt.option_text}
+                    </button>`;
+            });
+            html += `</div>`;
+        }
+        else if (q.question_type === "fill_blank") {
+            html += `
+                <input id="fillInput" type="text" class="fillblank-input" placeholder="Type your answer..." />
+            `;
+        }
+        else if (q.question_type === "spot_error") {
+            html += `<div class="spoterror-options">`;
+
+            shuffleArray(q.Options).forEach(opt => {
+                html += `
+                    <button class="spoterror-option"
+                        data-id="${opt.id}"
+                        data-selected="false"
+                        onclick="selectOption(${opt.id}, ${opt.is_correct})">
+                        ${opt.option_text}
+                    </button>
+                `;
+            });
+
+            html += `</div>`;
+        }
+        else if (q.question_type === "ordering") {
+            html += `<ul id="orderingList" class="ordering-list">`;
+
+            shuffleArray(q.Options).forEach(opt => {
+                html += `
+                    <li class="ordering-item"
+                        draggable="true"
+                        data-id="${opt.id}"
+                        data-order="${opt.order_position}">
+                        ${opt.option_text}
+                    </li>
+                `;
+            });
+
+            html += `</ul>`;
+        }
+        else if (q.question_type === "drag_drop_match") {
+            const draggables = shuffleArray(q.Options);
+
+            // Create one drop zone per unique match_key
+            const uniqueKeys = [...new Set(q.Options.map(o => o.match_key))];
+            const targets = uniqueKeys.map(key => ({ match_key: key }));
+
+            html += `<div class="drag-drop-container">`;
+            html += `<div class="drag-drop-left">`;
+            draggables.forEach(opt => {
+                html += `
+                    <div class="drag-item"
+                        draggable="true"
+                        data-id="${opt.id}"
+                        data-key="${opt.match_key}">
+                        ${opt.option_text}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            html += `<div class="drag-drop-right">`;
+            targets.forEach(opt => {
+                html += `
+                    <div class="drop-zone"
+                        data-key="${opt.match_key}">
+                        Drop here: ${opt.match_key}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            html += `</div>`;
+        }
+        
+        block.innerHTML = html;
+
+        if (q.question_type === "ordering") {
+            document.querySelectorAll(".ordering-item").forEach(item => {
+                item.addEventListener("dragstart", handleDragStart);
+                item.addEventListener("dragover", handleDragOver);
+                item.addEventListener("dragend", handleDragEnd);
+            });
+        }
+
+        if (q.question_type === "drag_drop_match") {
+            userMatches = {}; // reset matches
+
+            // Draggable items
+            document.querySelectorAll(".drag-item").forEach(item => {
+                item.addEventListener("dragstart", ddDragStart);
+            });
+
+            // Drop zones
+            document.querySelectorAll(".drop-zone").forEach(zone => {
+                zone.addEventListener("dragover", ddDragOver);
+                zone.addEventListener("dragleave", ddDragLeave);
+                zone.addEventListener("drop", ddDrop);
+            });
+        }
+
+        // Reset state
+        selectedOptionId = null;
+        selectedOptionIsCorrect = null;
+        document.getElementById("feedback").innerHTML = "";
+        document.getElementById("submitBtn").style.display = "inline-block";
+        document.getElementById("nextBtn").style.display = "none";
+
+        // Update header
+        document.querySelector("h2").textContent =
+            `Question ${index + 1} of ${totalQuestions}`;
+
+        updateProgressBar();
+    }
+
+    function handleDragStart(e) {
+    e.dataTransfer.setData("text/plain", e.target.dataset.id);
+    e.target.classList.add("dragging");
+}
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        const dragging = document.querySelector(".dragging");
+        const list = document.getElementById("orderingList");
+        const items = [...list.querySelectorAll(".ordering-item")];
+
+        const afterElement = items.find(item => {
+            const rect = item.getBoundingClientRect();
+            return e.clientY < rect.top + rect.height / 2;
+        });
+
+        if (!afterElement) {
+            list.appendChild(dragging);
+        } else {
+            list.insertBefore(dragging, afterElement);
+        }
+    }
+
+    function handleDragEnd(e) {
+        e.target.classList.remove("dragging");
+    }
+
+    function ddDragStart(e) {
+        // Store BOTH the match_key and the visible text
+        e.dataTransfer.setData("drag_key", e.target.dataset.key);
+        e.dataTransfer.setData("drag_text", e.target.innerText.trim());
+
+        e.target.classList.add("dragging");
+    }
+
+    function ddDragOver(e) {
+        e.preventDefault();
+        e.target.classList.add("drag-over");
+    }
+
+    function ddDragLeave(e) {
+        e.target.classList.remove("drag-over");
+    }
+
+    function ddDrop(e) {
+        e.preventDefault();
+        e.target.classList.remove("drag-over");
+
+        const dragKey = e.dataTransfer.getData("drag_key");      // draggable match_key
+        const dragText = e.dataTransfer.getData("drag_text");    // draggable text
+        const targetKey = e.target.dataset.key;                  // drop zone expected key
+
+        // Store match
+        userMatches[targetKey] = dragKey;
+
+        // Remove previous validation styling
+        e.target.classList.remove("correct", "incorrect");
+
+        // Apply filled state
+        e.target.classList.add("filled");
+
+        // Visual feedback
+        e.target.innerHTML = `${dragText} : ${targetKey}`;
+    }
 
     function selectOption(optionId, isCorrect) {
-        const btn = document.querySelector(`button[onclick*="${optionId}"]`);
+        const btn = document.querySelector(`[data-id="${optionId}"]`);
 
         // MCQ: single-select behaviour
         if (btn.classList.contains("mcq-option")) {
@@ -102,23 +281,29 @@
 
         // SpotError: multi-select toggle behaviour
         if (btn.classList.contains("spoterror-option")) {
-
-            // Always remove correctness styling when user interacts again
-            btn.classList.remove("correct", "incorrect");
+            // If user is starting a new attempt, clear previous selections
+            if (hasSubmitted) {
+                document.querySelectorAll(".spoterror-option").forEach(o => {
+                    o.classList.remove("selected", "correct", "incorrect");
+                    o.dataset.selected = "false";
+                });
+                hasSubmitted = false; // reset flag
+            }
 
             // Toggle selection
-            if (btn.classList.contains("selected")) {
-                btn.classList.remove("selected");
+            if (btn.dataset.selected === "true") {
                 btn.dataset.selected = "false";
+                btn.classList.remove("selected");
             } else {
-                btn.classList.add("selected");
                 btn.dataset.selected = "true";
+                btn.classList.add("selected");
             }
         }
     }
 
     function submitAnswer() {
-        const type = "@question.question_type";
+        attemptCount++;
+        const type = questions[currentIndex].question_type;
 
         if (type === "multiple_choice") {
             validateMCQ();
@@ -145,51 +330,53 @@
             return;
         }
 
-        const clickedBtn = document.querySelector(`button[onclick*="${selectedOptionId}"]`);
+        const clickedBtn = document.querySelector(`button[data-id="${selectedOptionId}"]`);
 
         // Clear previous correctness styling
         document.querySelectorAll('.mcq-option').forEach(b => {
             b.classList.remove('correct', 'incorrect');
         });
 
-        if (selectedOptionIsCorrect === "True") {
+        if (selectedOptionIsCorrect) {
             feedback.innerHTML = "<span class='correct'>Correct!</span>";
             clickedBtn.classList.add('correct');
 
-            disableAllAnswers();
+            sendAttemptToServer();
 
+            disableAllAnswers();
             document.getElementById("nextBtn").style.display = "block";
-        } else {
+        }
+        else {
             feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
             clickedBtn.classList.add('incorrect');
             document.getElementById("nextBtn").style.display = "none";
         }
-
     }
 
     function validateSpotError() {
+        hasSubmitted = true;
         const feedback = document.getElementById("feedback");
-
         const options = document.querySelectorAll(".spoterror-option");
+        const q = questions[currentIndex];
+
         let anySelected = false;
         let allSelectedAreCorrect = true;
         let allCorrectAreSelected = true;
 
-        // Remove previous styling (but DO NOT clear dataset.selected yet)
         options.forEach(opt => {
             opt.classList.remove("correct", "incorrect");
-            opt.classList.remove("selected");
         });
 
         // First pass: evaluate selected items
         options.forEach(opt => {
             const isSelected = opt.dataset.selected === "true";
-            const isCorrect = opt.getAttribute("onclick").includes("False");
+            const optionId = parseInt(opt.dataset.id);
+            const option = q.Options.find(o => o.id === optionId);
 
             if (isSelected) {
                 anySelected = true;
 
-                if (isCorrect) {
+                if (!option.is_correct) {
                     opt.classList.add("correct");
                 } else {
                     opt.classList.add("incorrect");
@@ -199,12 +386,12 @@
         });
 
         // Second pass: ensure ALL incorrect statements were selected
-        options.forEach(opt => {
-            const isCorrect = opt.getAttribute("onclick").includes("False");
-            const isSelected = opt.dataset.selected === "true";
-
-            if (isCorrect && !isSelected) {
-                allCorrectAreSelected = false;
+        q.Options.forEach(opt => {
+            if (!opt.is_correct) {
+                const btn = document.querySelector(`button[data-id="${opt.id}"]`);
+                if (btn.dataset.selected !== "true") {
+                    allCorrectAreSelected = false;
+                }
             }
         });
 
@@ -216,30 +403,29 @@
         if (allSelectedAreCorrect && allCorrectAreSelected) {
             feedback.innerHTML = "<span class='correct'>Correct — all incorrect statements were selected.</span>";
 
-            disableAllAnswers();
+            const firstIncorrect = q.Options.find(o => !o.is_correct);
+            selectedOptionId = firstIncorrect.id;
 
+            sendAttemptToServer();
+
+            disableAllAnswers();
             document.getElementById("nextBtn").style.display = "block";
-        } else {
+        }
+        else {
             feedback.innerHTML = "<span class='incorrect'>You must select ALL incorrect statements and no correct ones.</span>";
         }
-
-
-        // clear selection state AFTER evaluation
-        options.forEach(opt => {
-            opt.dataset.selected = "false";
-        });
     }
 
     function validateOrdering() {
         const items = document.querySelectorAll(".ordering-item");
         const feedback = document.getElementById("feedback");
+        const q = questions[currentIndex];
 
         let allCorrect = true;
 
         items.forEach((item, index) => {
             const correctPos = parseInt(item.dataset.order);
 
-            // Remove previous styling
             item.classList.remove("correct", "incorrect");
 
             if (correctPos === index + 1) {
@@ -253,13 +439,16 @@
         if (allCorrect) {
             feedback.innerHTML = "<span class='correct'>Correct order!</span>";
 
-            disableAllAnswers();
+            selectedOptionId = q.Options[0].id;
 
+            sendAttemptToServer();
+
+            disableAllAnswers();
             document.getElementById("nextBtn").style.display = "block";
-        } else {
+        }
+        else {
             feedback.innerHTML = "<span class='incorrect'>Some items are in the wrong order.</span>";
         }
-
     }
 
     function validateFillBlank() {
@@ -267,7 +456,10 @@
         const feedback = document.getElementById("feedback");
 
         const userAnswer = input.value.trim().toLowerCase();
-        const correctAnswer = "@question.Options.FirstOrDefault()?.option_text".toLowerCase();
+
+        // Get the correct option object
+        const correctOption = questions[currentIndex].Options.find(o => o.is_correct);
+        const correctAnswer = correctOption.option_text.toLowerCase();
 
         // Remove previous styling
         input.classList.remove("correct", "incorrect");
@@ -281,10 +473,15 @@
             feedback.innerHTML = "<span class='correct'>Correct!</span>";
             input.classList.add("correct");
 
+            // FIX: Now this works
+            selectedOptionId = correctOption.id;
+
+            sendAttemptToServer();
             disableAllAnswers();
 
             document.getElementById("nextBtn").style.display = "block";
-        } else {
+        }
+        else {
             feedback.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
             input.classList.add("incorrect");
         }
@@ -292,39 +489,46 @@
 
     function validateDragDropMatch() {
         const feedback = document.getElementById("feedback");
+        const q = questions[currentIndex];
 
-        const zones = document.querySelectorAll(".drop-zone");
         let allCorrect = true;
 
-        zones.forEach(zone => {
-            const correctKey = zone.dataset.key;
+        q.Options.forEach(opt => {
+            const correctKey = opt.match_key;
             const userKey = userMatches[correctKey];
 
-            // Remove previous styling
-            zone.classList.remove("correct", "incorrect");
-            zone.classList.remove("filled");
-
-            if (userKey === correctKey) {
-                zone.classList.add("correct");
-            } else {
-                zone.classList.add("incorrect");
+            if (correctKey !== userKey) {
                 allCorrect = false;
             }
         });
 
-        if (Object.keys(userMatches).length === 0) {
-            feedback.innerHTML = "<span class='incorrect'>Please complete all matches.</span>";
-            return;
-        }
+        // Apply correct/incorrect colours to each drop zone
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            const expectedKey = zone.dataset.key;
+            const userKey = userMatches[expectedKey];
+
+            // Remove previous states
+            zone.classList.remove("correct", "incorrect");
+
+            if (userKey === expectedKey) {
+                zone.classList.add("correct");
+            } else {
+                zone.classList.add("incorrect");
+            }
+        });
 
         if (allCorrect) {
-            feedback.innerHTML = "<span class='correct'>All matches correct!</span>";
+            feedback.innerHTML = "<span class='correct'>Correct!</span>";
+
+            selectedOptionId = q.Options[0].id;
+
+            sendAttemptToServer();
 
             disableAllAnswers();
-
             document.getElementById("nextBtn").style.display = "block";
-        } else {
-            feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect. Try again.</span>";
+        }
+        else {
+            feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect.</span>";
         }
     }
 
@@ -332,24 +536,19 @@
         currentIndex++;
 
         if (currentIndex < totalQuestions) {
-            // Normal navigation
-            window.location.href = `/Lesson/Start/@Model[0].lesson_id?index=${currentIndex}`;
+            // Load next question dynamically
+            loadQuestion(currentIndex);
         } 
         else {
             // Completion animation
             const bar = document.getElementById("lessonProgressBar");
             const banner = document.getElementById("lessonCompleteBanner");
 
-            // Fill bar to 100%
             bar.style.width = "100%";
-
-            // Pulse animation
             bar.style.animation = "progressPulse 0.8s ease-in-out 2";
-
-            // Show banner
             banner.classList.add("show");
 
-            // Redirect after animation
+            // Redirect to Complete page
             setTimeout(() => {
                 window.location.href = "/Lesson/Complete";
             }, 1200);
@@ -376,24 +575,24 @@
         const fillInput = document.getElementById("fillInput");
         if (fillInput) fillInput.disabled = true;
 
-        // DragDropMatch
-        document.querySelectorAll('.draggable').forEach(d => {
+       // DragDropMatch
+        document.querySelectorAll('.drag-item').forEach(d => {
             d.setAttribute("draggable", false);
 
             // Remove drag event listeners
-            d.removeEventListener("dragstart", handleDragStart);
-            d.removeEventListener("dragend", handleDragEnd);
+            d.removeEventListener("dragstart", ddDragStart);
 
-            // Add a disabled class for styling (optional)
+            // Visual disabled styling
             d.classList.add("disabled");
         });
 
         document.querySelectorAll('.drop-zone').forEach(zone => {
-            // Prevent dropping
-            zone.removeEventListener("dragover", handleDragOver);
-            zone.removeEventListener("drop", handleDrop);
+            // Remove drop listeners
+            zone.removeEventListener("dragover", ddDragOver);
+            zone.removeEventListener("dragleave", ddDragLeave);
+            zone.removeEventListener("drop", ddDrop);
 
-            // Optional: visually indicate disabled
+            // Visual disabled styling
             zone.classList.add("disabled");
         });
     }
@@ -404,5 +603,25 @@
     }
 
     updateProgressBar();
+
+    function sendAttemptToServer() {
+        const payload = {
+            questionId: currentQuestionId,
+            optionId: selectedOptionId,
+            isCorrect: selectedOptionIsCorrect,
+            timeTakenSeconds: 0, // add real timing later
+            attempts: attemptCount
+        };
+
+        fetch('/Lesson/RecordAttempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    }
+
+    window.onload = () => {
+        loadQuestion(currentIndex);
+    };
 
 </script>
