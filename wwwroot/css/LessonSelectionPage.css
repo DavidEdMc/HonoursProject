@@ -49,3 +49,14 @@
     color: #555;
     margin: 10px 0 20px;
 }
+
+.exam-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.exam-card {
+    max-width: 400px;
+}
+

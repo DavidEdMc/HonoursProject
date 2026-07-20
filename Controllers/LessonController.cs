@@ -17,9 +17,50 @@ public class LessonController : Controller
         if (username == null)
             return RedirectToAction("LoginPage", "Account");
 
+        var userId = HttpContext.Session.GetInt32("user_id");
+        if (userId == null)
+            return RedirectToAction("LoginPage", "Account");
+
+        // 1. Get all lessons
         var lessons = await _lessonService.GetAllLessonsAsync();
-        return View(lessons);
+
+        // 2. Get completed lesson IDs for this user
+        var completedLessonIds = await _lessonService.GetCompletedLessonIdsAsync(userId.Value);
+
+        // 3. Sort lessons by order_index
+        lessons = lessons.OrderBy(l => l.order_index).ToList();
+
+        // 4. Build the view model list
+        var model = new List<LessonProgressViewModel>();
+
+        for (int i = 0; i < lessons.Count; i++)
+        {
+            var lesson = lessons[i];
+
+            bool isCompleted = completedLessonIds.Contains(lesson.id);
+
+            bool isUnlocked = i == 0 || completedLessonIds.Contains(lessons[i - 1].id);
+
+            model.Add(new LessonProgressViewModel
+            {
+                Lesson = lesson,
+                IsCompleted = isCompleted,
+                IsUnlocked = isUnlocked
+            });
+        }
+
+        var exam = model.FirstOrDefault(m => m.Lesson.is_exam);
+        var normalLessons = model.Where(m => !m.Lesson.is_exam).ToList();
+
+        var pageModel = new LessonSelectionPageViewModel
+        {
+            Lessons = normalLessons,
+            Exam = exam
+        };
+
+        return View(pageModel);
     }
+
 
     public async Task<IActionResult> View(int id)
     {
@@ -27,22 +68,35 @@ public class LessonController : Controller
         if (username == null)
             return RedirectToAction("LoginPage", "Account");
 
+        var userId = HttpContext.Session.GetInt32("user_id");
+        if (userId == null)
+            return RedirectToAction("LoginPage", "Account");
+
         var lesson = await _lessonService.GetLessonByIdAsync(id);
         if (lesson == null)
             return NotFound();
 
-        // Get all lessons so we can find previous/next
+        // Get all lessons
         var lessons = await _lessonService.GetAllLessonsAsync();
-
-        // Sort by order_index
         lessons = lessons.OrderBy(l => l.order_index).ToList();
 
-        // Find current index
-        int currentIndex = lessons.FindIndex(l => l.id == id);
+        // Get completed lessons
+        var completedLessonIds = await _lessonService.GetCompletedLessonIdsAsync(userId.Value);
 
-        // Determine previous and next
-        int? previousId = currentIndex > 0 ? lessons[currentIndex - 1].id : null;
-        int? nextId = currentIndex < lessons.Count - 1 ? lessons[currentIndex + 1].id : null;
+        // Build unlocked lesson list
+        var unlockedLessons = new List<Lesson>();
+        for (int i = 0; i < lessons.Count; i++)
+        {
+            bool isUnlocked = i == 0 || completedLessonIds.Contains(lessons[i - 1].id);
+            if (isUnlocked)
+                unlockedLessons.Add(lessons[i]);
+        }
+
+        // Find current index within unlocked lessons
+        int currentIndex = unlockedLessons.FindIndex(l => l.id == id);
+
+        int? previousId = currentIndex > 0 ? unlockedLessons[currentIndex - 1].id : null;
+        int? nextId = currentIndex < unlockedLessons.Count - 1 ? unlockedLessons[currentIndex + 1].id : null;
 
         ViewBag.PreviousId = previousId;
         ViewBag.NextId = nextId;

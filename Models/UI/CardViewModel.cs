@@ -13,5 +13,7 @@ namespace HonoursProject.Models.UI
         public string CustomClasses { get; set; } = "";
         public string ButtonText { get; set; }
         public string ButtonUrl { get; set; }
+        public bool IsLocked { get; set; }
+
     }
 }

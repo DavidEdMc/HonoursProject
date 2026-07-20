@@ -1,6 +1,6 @@
 @model HonoursProject.Models.UI.CardViewModel
 
-<div class="app-card @Model.Variant @Model.CustomClasses">
+<div class="app-card @(Model.IsLocked ? "locked" : "") @Model.Variant @Model.CustomClasses">
 
     @* Optional Image *@
     @if (!string.IsNullOrEmpty(Model.ImageUrl))

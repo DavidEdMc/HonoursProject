@@ -1,4 +1,4 @@
-@model List<HonoursProject.Models.Lesson>
+@model LessonSelectionPageViewModel
 
 @{
     Layout = "_Layout";
@@ -12,17 +12,35 @@
 
     <div class="lesson-grid">
 
-        @foreach (var lesson in Model)
+        @foreach (var item in Model.Lessons)
         {
+            var lesson = item.Lesson;
+
             @await Html.PartialAsync("_Card", new CardViewModel {
                 Title = lesson.title,
                 Subtitle = lesson.description,
                 ImageUrl = lesson.IconPath,
-                ButtonText = "Start Lesson",
-                ButtonUrl = Url.Action("View", "Lesson", new { id = lesson.id })
+                ButtonText = item.IsUnlocked ? "Start Lesson" : "Locked",
+                ButtonUrl = item.IsUnlocked ? Url.Action("View", "Lesson", new { id = lesson.id }) : "#",
+                IsLocked = !item.IsUnlocked
             })
         }
 
     </div>
+
+    @if (Model.Exam != null)
+    {
+        <div class="exam-row">
+            @await Html.PartialAsync("_Card", new CardViewModel {
+                Title = Model.Exam.Lesson.title,
+                Subtitle = Model.Exam.Lesson.description,
+                ImageUrl = Model.Exam.Lesson.IconPath,
+                ButtonText = Model.Exam.IsUnlocked ? "Start Exam" : "Locked",
+                ButtonUrl = Model.Exam.IsUnlocked ? Url.Action("View", "Lesson", new { id = Model.Exam.Lesson.id }) : "#",
+                IsLocked = !Model.Exam.IsUnlocked,
+                CustomClasses = "exam-card"
+            })
+        </div>
+    }
 
 </div>

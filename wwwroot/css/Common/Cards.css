@@ -104,4 +104,12 @@
     color: var(--color-brand-secondary);
 }
 
+.app-card.locked {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
+.app-card.locked .btn {
+    background: #999;
+    cursor: not-allowed;
+}

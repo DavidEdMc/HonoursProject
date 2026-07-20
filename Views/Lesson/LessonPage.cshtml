@@ -15,25 +15,25 @@
     </div>
 
     <hr />
-
+    
     <div class="lesson-content">
-        <h2>Lesson Overview</h2>
-        <p>
-            This is placeholder lesson content. learning content will be populated here once it is implemented!
-        </p>
-
-        <img src="/assets/images/duck-minimalist-v2.png" class="lesson-mascot" alt="Mascot" />
-
-        <p>
-            Click below to begin the interactive lesson.
-        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.ContentHtml))
+        {
+            @Html.Raw(Model.ContentHtml)
+        }
+        else
+        {
+            <p>No lesson content has been added yet.</p>
+        }
     </div>
 
     <hr />
 
-    <a class="btn btn-lesson" href="@Url.Action("Start", "Lesson", new { id = Model.id })">
-        Start Lesson
-    </a>
+    <div class="lesson-cta">
+        <a class="btn btn-lesson" href="@Url.Action("Start", "Lesson", new { id = Model.id })">
+            Start Quiz
+        </a>
+    </div>
 
     <div class="lesson-navigation">
         @if (ViewBag.PreviousId != null)
@@ -58,6 +58,4 @@
             <span></span>
         }
     </div>
-
-
 </div>

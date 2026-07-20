@@ -30,7 +30,7 @@ namespace HonoursProject.Services
             {
                 await conn.OpenAsync();
 
-                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path
+                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path, content_html, is_exam
                                 FROM tb_lessons
                                 ORDER BY order_index";
 
@@ -47,7 +47,9 @@ namespace HonoursProject.Services
                             difficulty = SafeString(reader["difficulty"]),
                             order_index = SafeInt(reader["order_index"]),
                             is_active = SafeInt(reader["is_active"]) == 1,
-                            IconPath = SafeString(reader["icon_path"])
+                            IconPath = SafeString(reader["icon_path"]),
+                            ContentHtml = SafeString(reader["content_html"]),
+                            is_exam = SafeInt(reader["is_exam"]) == 1
                         });
                     }
                 }
@@ -62,7 +64,7 @@ namespace HonoursProject.Services
             {
                 await conn.OpenAsync();
 
-                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path
+                string query = @"SELECT id, title, description, difficulty, order_index, is_active, icon_path, content_html, is_exam
                                 FROM tb_lessons
                                 WHERE id = @id";
 
@@ -82,7 +84,9 @@ namespace HonoursProject.Services
                                 difficulty = SafeString(reader["difficulty"]),
                                 order_index = SafeInt(reader["order_index"]),
                                 is_active = SafeInt(reader["is_active"]) == 1,
-                                IconPath = SafeString(reader["icon_path"])
+                                IconPath = SafeString(reader["icon_path"]),
+                                ContentHtml = SafeString(reader["content_html"]),
+                                is_exam = SafeInt(reader["is_exam"]) == 1
                             };
                         }
                     }
@@ -303,6 +307,37 @@ namespace HonoursProject.Services
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        public async Task<List<int>> GetCompletedLessonIdsAsync(int userId)
+        {
+            var completed = new List<int>();
+
+            using (var conn = _db.GetConnection())
+            {
+                await conn.OpenAsync();
+
+                string query = @"
+                    SELECT DISTINCT lesson_id
+                    FROM tb_user_lesson_history
+                    WHERE user_id = @userId;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            completed.Add(SafeInt(reader["lesson_id"]));
+                        }
+                    }
+                }
+            }
+
+            return completed;
         }
     }
 }
