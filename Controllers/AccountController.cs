@@ -6,9 +6,12 @@ using System.Security.Cryptography;
 public class AccountController : Controller
 {
     private readonly UserService _userService;
-    public AccountController(UserService userService)
+    private readonly AchievementService _achievementService;
+
+    public AccountController(UserService userService, AchievementService achievementService)
     {
         _userService = userService;
+        _achievementService = achievementService;
     }
 
     public IActionResult LoginPage()
@@ -116,8 +119,6 @@ public class AccountController : Controller
         return View(user);
     }
 
-
-
     public IActionResult AchievementsPage()
     {
         var username = HttpContext.Session.GetString("username");
@@ -126,7 +127,11 @@ public class AccountController : Controller
             return RedirectToAction("LoginPage", "Account");
         }
 
-        return View();
+        var user = _userService.GetUserByUsername(username);
+
+        var achievementsList = _achievementService.GetAllAchievementsForUser(user.Id);
+
+        return View(achievementsList);
     }
 
     public IActionResult SettingsPage()

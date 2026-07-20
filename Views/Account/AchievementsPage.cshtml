@@ -1,3 +1,5 @@
+@model List<HonoursProject.Models.AchievementViewModel>
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Achievements";
@@ -15,33 +17,39 @@
         @await Html.PartialAsync("_BackToProfileButton")
     }
 
-    
     <h1 class="achievements-title">Your Achievements</h1>
     <p class="achievements-subtitle">Track your progress and unlock new badges</p>
 
-    <div class="achievements-grid">
+   @{
+    var grouped = Model
+        .OrderBy(a => a.Category)
+        .GroupBy(a => a.Category);
+    }
 
-        <!-- Achievement 1 -->
-        <div class="achievement-card unlocked">
-            <img src="~/images/duck-minimalist.png" class="achievement-icon" alt="Badge" />
-            <h3 class="achievement-name">First Steps</h3>
-            <p class="achievement-desc">Completed your first lesson</p>
+    @foreach (var categoryGroup in grouped)
+    {
+        <h2 class="achievement-category-title">@char.ToUpper(categoryGroup.Key[0])@categoryGroup.Key.Substring(1)</h2>
+        <hr class="achievement-category-divider" />
+
+        <div class="achievements-grid">
+            @foreach (var a in categoryGroup)
+            {
+                var unlocked = a.IsUnlocked;
+                var cardClass = unlocked ? "achievement-card unlocked" : "achievement-card locked";
+                var iconClass = unlocked ? "achievement-icon" : "achievement-icon locked-icon";
+
+                <div class="@cardClass" data-category="@a.Category">
+                    <img src="~/assets/images/achievements/@a.Category-icon.png" class="@iconClass" alt="Badge" />
+
+                    <h3 class="achievement-name">@a.Name</h3>
+                    <p class="achievement-desc">@a.Description</p>
+
+                    @if (!unlocked)
+                    {
+                        <p class="achievement-locked-label">Locked</p>
+                    }
+                </div>
+            }
         </div>
-
-        <!-- Achievement 2 -->
-        <div class="achievement-card locked">
-            <img src="~/images/duck-minimalist.png" class="achievement-icon locked-icon" alt="Badge" />
-            <h3 class="achievement-name">On a Roll</h3>
-            <p class="achievement-desc">Complete 5 lessons</p>
-        </div>
-
-        <!-- Achievement 3 -->
-        <div class="achievement-card locked">
-            <img src="~/images/duck-minimalist.png" class="achievement-icon locked-icon" alt="Badge" />
-            <h3 class="achievement-name">Dedicated Learner</h3>
-            <p class="achievement-desc">Maintain a 7‑day streak</p>
-        </div>
-
-    </div>
-
+    }
 </div>

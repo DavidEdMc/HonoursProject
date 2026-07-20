@@ -57,3 +57,105 @@
     color: var(--font-color);
     margin-top: 8px;
 }
+
+/* Achievement Card Base */
+.achievement-card {
+    background: var(--color-brand-tertiary);
+    border-radius: 14px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Category Accent Bar */
+.achievement-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+    width: 100%;
+    background: var(--color-brand-primary);
+    opacity: 0.8;
+}
+
+/* Hover effect */
+.achievement-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* Unlocked State */
+.achievement-card.unlocked {
+    opacity: 1;
+}
+
+.achievement-card.unlocked .achievement-icon {
+    filter: none;
+    opacity: 1;
+}
+
+/* Locked State */
+.achievement-card.locked {
+    opacity: 0.55;
+}
+
+.achievement-card.locked .achievement-icon {
+    filter: grayscale(100%) brightness(70%);
+}
+
+/* Achievement Icon */
+.achievement-icon {
+    width: 85px;
+    height: 85px;
+    margin-bottom: 15px;
+    object-fit: contain;
+}
+
+/* Achievement Name */
+.achievement-name {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Achievement Description */
+.achievement-desc {
+    color: var(--font-color);
+    margin-top: 8px;
+    font-size: 0.95rem;
+}
+
+/* Locked Label */
+.achievement-locked-label {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+}
+
+.achievement-category-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    color: var(--font-color);
+}
+
+.achievement-category-divider {
+    border: none;
+    border-top: 2px solid var(--color-brand-primary);
+    margin-bottom: 25px;
+    opacity: 0.6;
+}
+
+.achievement-card[data-category="progression"]::before { background: #4CAF50; }
+.achievement-card[data-category="lesson"]::before { background: #2196F3; }
+.achievement-card[data-category="level"]::before { background: #9C27B0; }
+.achievement-card[data-category="streak"]::before { background: #FF9800; }
+.achievement-card[data-category="performance"]::before { background: #F44336; }
+.achievement-card[data-category="engagement"]::before { background: #795548; }
+.achievement-card[data-category="special"]::before { background: #607D8B; }
