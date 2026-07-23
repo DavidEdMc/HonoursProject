@@ -215,26 +215,35 @@ public class LessonController : Controller
     [HttpPost]
     public IActionResult RecordAttempt([FromBody] QuestionAttemptDto attempt)
     {
-        var userId = HttpContext.Session.GetInt32("user_id");
-        if (userId == null)
-            return Unauthorized();
+        try
+        {
+            var userId = HttpContext.Session.GetInt32("user_id");
+            if (userId == null)
+                return Unauthorized();
 
-        _lessonService.RecordQuestionAttempt(
-            userId.Value,
-            attempt.QuestionId,
-            attempt.OptionId,
-            attempt.IsCorrect,
-            attempt.TimeTakenSeconds,
-            attempt.Attempts
-        );
+            _lessonService.RecordQuestionAttempt(
+                userId.Value,
+                attempt.QuestionId,
+                attempt.OptionId ?? 0,
+                attempt.IsCorrect,
+                attempt.TimeTakenSeconds,
+                attempt.Attempts
+            );
 
-        return Ok();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("RecordAttempt ERROR: " + ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return StatusCode(500, ex.Message);
+        }
     }
 
     public class QuestionAttemptDto
     {
         public int QuestionId { get; set; }
-        public int OptionId { get; set; }
+        public int? OptionId { get; set; }
         public bool IsCorrect { get; set; }
         public int TimeTakenSeconds { get; set; }
         public int Attempts { get; set; }

@@ -313,15 +313,14 @@ function validateSpotError() {
     const options = document.querySelectorAll(".spoterror-option");
     const q = questions[currentIndex];
 
+    currentQuestionId = q.id; 
+
     let anySelected = false;
     let allSelectedAreCorrect = true;
     let allCorrectAreSelected = true;
 
-    options.forEach(opt => {
-        opt.classList.remove("correct", "incorrect");
-    });
+    options.forEach(opt => opt.classList.remove("correct", "incorrect"));
 
-    // First pass: evaluate selected items
     options.forEach(opt => {
         const isSelected = opt.dataset.selected === "true";
         const optionId = parseInt(opt.dataset.id);
@@ -339,7 +338,6 @@ function validateSpotError() {
         }
     });
 
-    // Second pass: ensure ALL incorrect statements were selected
     q.Options.forEach(opt => {
         if (!opt.is_correct) {
             const btn = document.querySelector(`button[data-id="${opt.id}"]`);
@@ -360,13 +358,14 @@ function validateSpotError() {
         const firstIncorrect = q.Options.find(o => !o.is_correct);
         selectedOptionId = firstIncorrect.id;
 
-        sendAttemptToServer();
+        selectedOptionIsCorrect = true; 
 
+        sendAttemptToServer();
         disableAllAnswers();
         document.getElementById("nextBtn").style.display = "block";
-    }
-    else {
+    } else {
         feedback.innerHTML = "<span class='incorrect'>You must select ALL incorrect statements and no correct ones.</span>";
+        selectedOptionIsCorrect = false; 
     }
 }
 
@@ -374,6 +373,8 @@ function validateOrdering() {
     const items = document.querySelectorAll(".ordering-item");
     const feedback = document.getElementById("feedback");
     const q = questions[currentIndex];
+
+    currentQuestionId = q.id;
 
     let allCorrect = true;
 
@@ -394,14 +395,14 @@ function validateOrdering() {
         feedback.innerHTML = "<span class='correct'>Correct order!</span>";
 
         selectedOptionId = q.Options[0].id;
+        selectedOptionIsCorrect = true; 
 
         sendAttemptToServer();
-
         disableAllAnswers();
         document.getElementById("nextBtn").style.display = "block";
-    }
-    else {
+    } else {
         feedback.innerHTML = "<span class='incorrect'>Some items are in the wrong order.</span>";
+        selectedOptionIsCorrect = false; 
     }
 }
 
@@ -409,13 +410,13 @@ function validateFillBlank() {
     const input = document.getElementById("fillInput");
     const feedback = document.getElementById("feedback");
 
-    const userAnswer = input.value.trim().toLowerCase();
+    const q = questions[currentIndex];
+    currentQuestionId = q.id; 
 
-    // Get the correct option object
-    const correctOption = questions[currentIndex].Options.find(o => o.is_correct);
+    const userAnswer = input.value.trim().toLowerCase();
+    const correctOption = q.Options.find(o => o.is_correct);
     const correctAnswer = correctOption.option_text.toLowerCase();
 
-    // Remove previous styling
     input.classList.remove("correct", "incorrect");
 
     if (userAnswer === "") {
@@ -427,17 +428,17 @@ function validateFillBlank() {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
         input.classList.add("correct");
 
-        // FIX: Now this works
         selectedOptionId = correctOption.id;
+        selectedOptionIsCorrect = true; 
 
         sendAttemptToServer();
         disableAllAnswers();
-
         document.getElementById("nextBtn").style.display = "block";
-    }
-    else {
+    } else {
         feedback.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
         input.classList.add("incorrect");
+
+        selectedOptionIsCorrect = false; 
     }
 }
 
@@ -445,8 +446,11 @@ function validateDragDropMatch() {
     const feedback = document.getElementById("feedback");
     const q = questions[currentIndex];
 
+    currentQuestionId = q.id;
+
     let allCorrect = true;
 
+    // Check correctness
     q.Options.forEach(opt => {
         const correctKey = opt.match_key;
         const userKey = userMatches[correctKey];
@@ -461,7 +465,6 @@ function validateDragDropMatch() {
         const expectedKey = zone.dataset.key;
         const userKey = userMatches[expectedKey];
 
-        // Remove previous states
         zone.classList.remove("correct", "incorrect");
 
         if (userKey === expectedKey) {
@@ -475,16 +478,19 @@ function validateDragDropMatch() {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
 
         selectedOptionId = q.Options[0].id;
+        selectedOptionIsCorrect = true;
 
         sendAttemptToServer();
-
         disableAllAnswers();
         document.getElementById("nextBtn").style.display = "block";
     }
     else {
         feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect.</span>";
+
+        selectedOptionIsCorrect = false;
     }
 }
+
 
 function nextQuestion() {
     currentIndex++;
