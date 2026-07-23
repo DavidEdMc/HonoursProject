@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 public class LessonController : Controller
 {
     private readonly LessonService _lessonService;
+    private readonly AchievementService _achievementService;
 
-    public LessonController(LessonService lessonService)
+    public LessonController(LessonService lessonService, AchievementService achievementService)
     {
         _lessonService = lessonService;
+        _achievementService = achievementService;
     }
 
     public async Task<IActionResult> LessonSelectionPage()
@@ -128,7 +130,7 @@ public class LessonController : Controller
         return View(lessons);
     }
 
-    public IActionResult Complete()
+    public async Task<IActionResult> Complete()
     {
         var userId = HttpContext.Session.GetInt32("user_id");
         if (userId == null)
@@ -163,7 +165,7 @@ public class LessonController : Controller
         // -----------------------------
         // 3. Save lesson history
         // -----------------------------
-        _lessonService.SaveLessonHistory(userId.Value, lessonId, score, durationSeconds);
+        await _lessonService.SaveLessonHistory(userId.Value, lessonId, score, durationSeconds);
 
         // -----------------------------
         // 4. Award XP
@@ -186,7 +188,22 @@ public class LessonController : Controller
         HttpContext.Session.Remove("LessonStartTime");
 
         // -----------------------------
-        // 7. Pass data to the view
+        // 7. Unlock achievements
+        // -----------------------------
+        var unlocked = new List<AchievementViewModel>();
+
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "progression"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "lesson"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "engagement"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "performance"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "special"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "level"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "streak"));
+
+        ViewBag.UnlockedAchievements = unlocked;
+
+        // -----------------------------
+        // 8. Pass data to the view
         // -----------------------------
         ViewBag.Score = score;
         ViewBag.Xp = xp;

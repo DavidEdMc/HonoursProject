@@ -10,66 +10,43 @@
     <p>XP Earned: @ViewBag.Xp</p>
     <p>Time Taken: @ViewBag.Duration seconds</p>
 
-
     <a class="btn btn-lesson" href="/Lesson/LessonSelectionPage">Back to Lessons</a>
 </div>
+
+@if (ViewBag.UnlockedAchievements != null)
+{
+    var json = System.Text.Json.JsonSerializer.Serialize(ViewBag.UnlockedAchievements);
+    <script>
+        localStorage.setItem("pendingAchievements", '@Html.Raw(json)');
+    </script>
+}
 
 <!-- Confetti Canvas -->
 <canvas id="confettiCanvas"></canvas>
 
 <script>
-    function launchConfetti() {
-        const canvas = document.getElementById("confettiCanvas");
-        const ctx = canvas.getContext("2d");
+@{
+    Layout = "_Layout";
+}
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+<div class="lesson-page-container">
+    <h1>Lesson Complete!</h1>
+    <p>You’ve finished all questions for this lesson.</p>
+    <hr />
+    <p>Score: @ViewBag.Score</p>
+    <p>XP Earned: @ViewBag.Xp</p>
+    <p>Time Taken: @ViewBag.Duration seconds</p>
 
-        const confetti = [];
-        const colors = ["#4a90e2", "#50e3c2", "#f5a623", "#e94e77", "#bd10e0"];
+    <a class="btn btn-lesson" href="/Lesson/LessonSelectionPage">Back to Lessons</a>
+</div>
 
-        // Create confetti particles
-        for (let i = 0; i < 150; i++) {
-            confetti.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height - canvas.height,
-                r: Math.random() * 6 + 4,
-                d: Math.random() * 0.5 + 0.5,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                tilt: Math.random() * 10 - 10
-            });
-        }
+@if (ViewBag.UnlockedAchievements != null)
+{
+    var json = System.Text.Json.JsonSerializer.Serialize(ViewBag.UnlockedAchievements);
+    <script>
+        localStorage.setItem("pendingAchievements", @Html.Raw(json));
+    </script>
+}
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            confetti.forEach(p => {
-                ctx.beginPath();
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.r, p.r);
-            });
-
-            update();
-        }
-
-        function update() {
-            confetti.forEach(p => {
-                p.y += p.d * 4;
-                p.x += Math.sin(p.tilt) * 2;
-                p.tilt += 0.1;
-
-                if (p.y > canvas.height) {
-                    p.y = -10;
-                    p.x = Math.random() * canvas.width;
-                }
-            });
-        }
-
-        (function animate() {
-            draw();
-            requestAnimationFrame(animate);
-        })();
-    }
-
-    window.onload = launchConfetti;
-</script>
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas"></canvas>

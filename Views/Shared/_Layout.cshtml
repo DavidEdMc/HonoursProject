@@ -21,6 +21,9 @@
             @RenderBody()
         </main>
     </div>
+
+    @await Html.PartialAsync("_AchievementPopup")
+
     <!--Footer-->
     @await Html.PartialAsync("_LayoutFooter")
     <!--Scripts-->

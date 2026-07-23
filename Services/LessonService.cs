@@ -230,50 +230,62 @@ namespace HonoursProject.Services
             }
         }
 
-        public void SaveLessonHistory(int userId, int lessonId, int score, int durationSeconds)
+        public async Task SaveLessonHistory(int userId, int lessonId, int score, int durationSeconds)
         {
-            using (var conn = _db.GetConnection())
-            {
-                conn.Open();
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
 
-                string query = @"
-                    INSERT INTO tb_user_lesson_history
-                    (user_id, lesson_id, score, time_taken_seconds, completed_at)
-                    VALUES (@userId, @lessonId, @score, @duration, @completedAt);
-                ";
+            string query = @"
+                INSERT INTO tb_user_lesson_history (user_id, lesson_id, score, time_taken_seconds, completed_at)
+                VALUES (@u, @l, @s, @t, NOW());
+            ";
 
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@userId", userId);
-                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
-                    cmd.Parameters.AddWithValue("@score", score);
-                    cmd.Parameters.AddWithValue("@duration", durationSeconds);
-                    cmd.Parameters.AddWithValue("@completedAt", DateTime.UtcNow);
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+            cmd.Parameters.AddWithValue("@l", lessonId);
+            cmd.Parameters.AddWithValue("@s", score);
+            cmd.Parameters.AddWithValue("@t", durationSeconds);
 
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void AddXp(int userId, int xp)
+        public async Task AddXp(int userId, int xpToAdd)
         {
-            using (var conn = _db.GetConnection())
-            {
-                conn.Open();
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
 
-                string query = @"
-                    UPDATE tb_user_xp
-                    SET xp = xp + @xp
-                    WHERE user_id = @userId;
-                ";
+            // 1. Get current XP
+            string getQuery = @"
+                SELECT xp
+                FROM tb_user_xp
+                WHERE user_id = @u;
+            ";
 
-                using (var cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@xp", xp);
-                    cmd.Parameters.AddWithValue("@userId", userId);
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            var getCmd = new MySqlCommand(getQuery, conn);
+            getCmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await getCmd.ExecuteScalarAsync();
+            int currentXp = result != null ? Convert.ToInt32(result) : 0;
+
+            // 2. Add XP
+            int newXp = currentXp + xpToAdd;
+
+            // 3. Calculate new level
+            int newLevel = (newXp / 100) + 1;
+
+            // 4. Save XP + Level
+            string updateQuery = @"
+                UPDATE tb_user_xp
+                SET xp = @xp, level = @lvl
+                WHERE user_id = @u;
+            ";
+
+            var updateCmd = new MySqlCommand(updateQuery, conn);
+            updateCmd.Parameters.AddWithValue("@xp", newXp);
+            updateCmd.Parameters.AddWithValue("@lvl", newLevel);
+            updateCmd.Parameters.AddWithValue("@u", userId);
+
+            await updateCmd.ExecuteNonQueryAsync();
         }
 
         public void UpdateUserStats(int userId, int lessonId, int score, int durationSeconds)
@@ -338,6 +350,176 @@ namespace HonoursProject.Services
             }
 
             return completed;
+        }
+
+        public async Task<int> GetTotalLessonsCompletedAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            var cmd = new MySqlCommand(
+                "SELECT COUNT(*) FROM tb_user_lesson_history WHERE user_id = @u", conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        public async Task<int> GetTotalQuestionsAnsweredAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            var cmd = new MySqlCommand(
+                "SELECT COUNT(*) FROM tb_user_question_attempts WHERE user_id = @u",
+                conn
+            );
+
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        public async Task<int> GetLastLessonCompletionTimeAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT HOUR(completed_at)
+                FROM tb_user_lesson_history
+                WHERE user_id = @u
+                ORDER BY completed_at DESC
+                LIMIT 1;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
+        public async Task<int> GetLastLessonScoreAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT score
+                FROM tb_user_lesson_history
+                WHERE user_id = @u
+                ORDER BY completed_at DESC
+                LIMIT 1;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
+
+        public async Task<int> GetUserLevelAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT level
+                FROM tb_user_xp
+                WHERE user_id = @u;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 1;
+        }
+
+        public async Task<int> GetUserStreakAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT DATE(completed_at)
+                FROM tb_user_lesson_history
+                WHERE user_id = @u
+                ORDER BY completed_at DESC;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            var dates = new List<DateTime>();
+
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    dates.Add(reader.GetDateTime(0).Date);
+                }
+            }
+
+            if (dates.Count == 0)
+                return 0;
+
+            int streak = 1;
+            DateTime current = dates[0];
+
+            for (int i = 1; i < dates.Count; i++)
+            {
+                if (dates[i] == current.AddDays(-1))
+                {
+                    streak++;
+                    current = dates[i];
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return streak;
+        }
+
+        public async Task<int> GetLastLessonDurationAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT time_taken_seconds
+                FROM tb_user_lesson_history
+                WHERE user_id = @u
+                ORDER BY completed_at DESC
+                LIMIT 1;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 99999;
+        }
+
+        public async Task<bool> HasCompletedLessonAsync(int userId, int lessonId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT COUNT(*)
+                FROM tb_user_lesson_history
+                WHERE user_id = @u AND lesson_id = @l;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+            cmd.Parameters.AddWithValue("@l", lessonId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync()) > 0;
         }
     }
 }

@@ -159,3 +159,26 @@
 .achievement-card[data-category="performance"]::before { background: #F44336; }
 .achievement-card[data-category="engagement"]::before { background: #795548; }
 .achievement-card[data-category="special"]::before { background: #607D8B; }
+
+.achievement-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--color-brand-tertiary);
+    border: 5px solid var(--color-brand-secondary);
+    color: #000;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
