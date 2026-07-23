@@ -18,7 +18,6 @@
     var json = System.Text.Json.JsonSerializer.Serialize(ViewBag.UnlockedAchievements);
 
     <script>
-        // ⭐ IMPORTANT: JSON must be wrapped in quotes so it becomes a valid string
         localStorage.setItem("pendingAchievements", '@Html.Raw(json)');
     </script>
 }
