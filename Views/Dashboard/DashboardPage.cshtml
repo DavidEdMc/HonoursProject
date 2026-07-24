@@ -1,4 +1,5 @@
-@model List<HonoursProject.Models.LeaderboardEntry>
+@model HonoursProject.Models.DashboardViewModel
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Dashboard";
@@ -6,7 +7,7 @@
 
 <div class="dashboard-container">
     <!-- Header -->
-    <h1 class="dashboard-title">Welcome back, @ViewBag.Username</h1>
+    <h1 class="dashboard-title">Welcome back, @Model.Username</h1>
     <p class="dashboard-subtitle">Here’s your learning overview</p>
 
     <!-- Continue Learning Card -->
@@ -17,38 +18,39 @@
         ButtonUrl = Url.Action("LessonPage", "Lesson")
     })
 
-    <!-- Leaderboard Card (moved ABOVE the stat grid) -->
-    @await Html.PartialAsync("_Leaderboard", Model)
+    <!-- Leaderboard Card -->
+    @await Html.PartialAsync("_Leaderboard", Model.Leaderboard)
 
     <!-- Grid Layout -->
     <div class="dashboard-grid">
-        <!-- Lessons Completed (entire card clickable) -->
+
+        <!-- Lessons Completed -->
         <a href="@Url.Action("LessonSelectionPage", "Lesson")" class="app-card-link-wrapper">
             @await Html.PartialAsync("_Card", new CardViewModel {
                 Variant = "app-card-stat app-card-clickable",
-                Content = new HtmlString(@"
-                    <div class='stat-value'>20%</div>
+                Content = new HtmlString($@"
+                    <div class='stat-value'>{Model.LessonsCompleted}</div>
                     <div class='stat-label'>Lessons Completed</div>
                 ")
             })
         </a>
 
-        <!-- Achievements Earned (entire card clickable) -->
+        <!-- Achievements Earned -->
         <a href="@Url.Action("AchievementsPage", "Account", new { from = "dashboard" })" class="app-card-link-wrapper">
             @await Html.PartialAsync("_Card", new CardViewModel {
                 Variant = "app-card-stat app-card-clickable",
-                Content = new HtmlString(@"
-                    <div class='stat-value'>0</div>
+                Content = new HtmlString($@"
+                    <div class='stat-value'>{Model.AchievementsEarned}</div>
                     <div class='stat-label'>Achievements Earned</div>
                 ")
             })
         </a>
 
-        <!-- Current Streak (not clickable) -->
+        <!-- Current Streak -->
         @await Html.PartialAsync("_Card", new CardViewModel {
             Variant = "app-card-stat",
-            Content = new HtmlString(@"
-                <div class='stat-value'>0</div>
+            Content = new HtmlString($@"
+                <div class='stat-value'>{Model.DayStreak}</div>
                 <div class='stat-label'>Day Streak</div>
             ")
         })

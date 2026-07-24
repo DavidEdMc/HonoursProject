@@ -16,6 +16,7 @@
 @section Scripts {
     <script>
         window.lessonData = {
+            lessonId: @ViewBag.LessonId,
             questions: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model)),
             currentIndex: @ViewBag.Index
         };

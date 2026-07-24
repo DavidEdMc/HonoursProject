@@ -121,6 +121,7 @@ public class LessonController : Controller
             index = 0;
 
         ViewBag.Index = index;
+        ViewBag.LessonId = id;
         return View("LessonRunner", questions);
     }
 
@@ -172,8 +173,8 @@ public class LessonController : Controller
         // -----------------------------
         int xp = score;
 
-        if (durationSeconds < 60) xp += 50;   // speed bonus
-        if (durationSeconds < 30) xp += 100;  // lightning bonus
+        if (durationSeconds < 60) xp += 25;   // speed bonus
+        if (durationSeconds < 30) xp += 50;  // lightning bonus
 
         _lessonService.AddXp(userId.Value, xp);
 
@@ -223,6 +224,7 @@ public class LessonController : Controller
 
             _lessonService.RecordQuestionAttempt(
                 userId.Value,
+                attempt.LessonId,
                 attempt.QuestionId,
                 attempt.OptionId ?? 0,
                 attempt.IsCorrect,
@@ -242,6 +244,7 @@ public class LessonController : Controller
 
     public class QuestionAttemptDto
     {
+        public int LessonId { get; set; }
         public int QuestionId { get; set; }
         public int? OptionId { get; set; }
         public bool IsCorrect { get; set; }

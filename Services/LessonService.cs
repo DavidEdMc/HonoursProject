@@ -180,7 +180,7 @@ namespace HonoursProject.Services
             return options;
         }
 
-        public void RecordQuestionAttempt(int userId, int questionId, int optionId, bool isCorrect, int timeTaken, int attempts)
+        public void RecordQuestionAttempt(int userId, int lessonId, int questionId, int optionId, bool isCorrect, int timeTaken, int attempts)
         {
             using (var conn = _db.GetConnection())
             {
@@ -188,13 +188,14 @@ namespace HonoursProject.Services
 
                 string query = @"
                     INSERT INTO tb_user_question_attempts
-                    (user_id, question_id, selected_option_id, is_correct, time_taken_seconds, attempts)
-                    VALUES (@userId, @questionId, @optionId, @isCorrect, @timeTaken, @attempts);
+                    (user_id, lesson_id, question_id, selected_option_id, is_correct, time_taken_seconds, attempts)
+                    VALUES (@userId, @lessonId, @questionId, @optionId, @isCorrect, @timeTaken, @attempts);
                 ";
 
                 using (var cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
                     cmd.Parameters.AddWithValue("@questionId", questionId);
                     cmd.Parameters.AddWithValue("@optionId", optionId);
                     cmd.Parameters.AddWithValue("@isCorrect", isCorrect ? 1 : 0);
@@ -529,7 +530,7 @@ namespace HonoursProject.Services
 
             string query = @"
                 SELECT lesson_id
-                FROM tb_user_lessons
+                FROM tb_user_lesson_history
                 WHERE user_id = @u
                 ORDER BY completed_at DESC
                 LIMIT 1;

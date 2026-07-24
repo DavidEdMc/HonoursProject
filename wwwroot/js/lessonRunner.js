@@ -15,6 +15,7 @@ let userMatches = {};
 let hasSubmitted = false;
 let currentQuestionId = null;
 let attemptCount = 0;
+let currentLessonId = window.lessonData.lessonId ?? window.lessonData.id;
 
 function loadQuestion(index) {
     const q = questions[index];
@@ -565,11 +566,21 @@ function updateProgressBar() {
 updateProgressBar();
 
 function sendAttemptToServer() {
-    const payload = {
+    console.log("Sending attempt payload:", {
+        lessonId: currentLessonId,
         questionId: currentQuestionId,
         optionId: selectedOptionId,
         isCorrect: selectedOptionIsCorrect,
-        timeTakenSeconds: 0, // add real timing later
+        timeTakenSeconds: 0,
+        attempts: attemptCount
+    });
+
+    const payload = {
+        lessonId: currentLessonId,
+        questionId: currentQuestionId,
+        optionId: selectedOptionId,
+        isCorrect: selectedOptionIsCorrect,
+        timeTakenSeconds: 0,
         attempts: attemptCount
     };
 
