@@ -521,5 +521,38 @@ namespace HonoursProject.Services
 
             return Convert.ToInt32(await cmd.ExecuteScalarAsync()) > 0;
         }
+
+        public async Task<int> GetLastCompletedLessonIdAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT lesson_id
+                FROM tb_user_lessons
+                WHERE user_id = @u
+                ORDER BY completed_at DESC
+                LIMIT 1;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            var result = await cmd.ExecuteScalarAsync();
+            return result == null ? 0 : Convert.ToInt32(result);
+        }
+
+        public async Task<int> GetTotalQuestionsForLessonAsync(int lessonId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = "SELECT COUNT(*) FROM tb_questions WHERE lesson_id = @l";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@l", lessonId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
     }
 }

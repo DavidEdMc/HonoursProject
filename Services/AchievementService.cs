@@ -127,6 +127,16 @@ namespace HonoursProject.Services
                             userMetricValue = await _lessonService.GetLastLessonCompletionTimeAsync(userId) >= requirement ? requirement : 0;
                             break;
 
+                        case "perfect_score_on_lesson":
+                            int lastLessonId = await _lessonService.GetLastCompletedLessonIdAsync(userId);
+                            int lastScore = await _lessonService.GetLastLessonScoreAsync(userId);
+
+                            // requirement_value = lessonId
+                            userMetricValue = (lastLessonId == requirement && lastScore == await _lessonService.GetTotalQuestionsForLessonAsync(requirement))
+                                ? requirement
+                                : 0;
+                            break;
+
                         default:
                             userMetricValue = 0;
                             break;
@@ -205,5 +215,6 @@ namespace HonoursProject.Services
 
             return Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
+
     }
 }
