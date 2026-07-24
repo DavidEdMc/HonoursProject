@@ -296,8 +296,15 @@ namespace HonoursProject.Services
                 conn.Open();
 
                 string query = @"
-                    UPDATE tb_user_stats
-                    SET lessons_completed = lessons_completed + 1,
+                    INSERT INTO tb_user_stats (
+                        user_id, lessons_completed, score, fastest_lesson_seconds,
+                        last_lesson_date, current_streak, highest_streak
+                    )
+                    VALUES (
+                        @userId, 1, @score, @duration, @completedAt, 1, 1
+                    )
+                    ON DUPLICATE KEY UPDATE
+                        lessons_completed = lessons_completed + 1,
                         score = score + @score,
                         fastest_lesson_seconds = LEAST(fastest_lesson_seconds, @duration),
                         last_lesson_date = @completedAt,
@@ -306,8 +313,7 @@ namespace HonoursProject.Services
                             THEN current_streak + 1
                             ELSE 1
                         END,
-                        highest_streak = GREATEST(highest_streak, current_streak)
-                    WHERE user_id = @userId;
+                        highest_streak = GREATEST(highest_streak, current_streak);
                 ";
 
                 using (var cmd = new MySqlCommand(query, conn))
