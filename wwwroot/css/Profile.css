@@ -44,8 +44,8 @@
 
 .level-badge {
     display: inline-block;
-    background: #4caf50;
-    color: white;
+    background: var(--color-brand-secondary) ;
+    color: var(--color-brand-tertiary);
     padding: 4px 10px;
     border-radius: 12px;
     font-weight: bold;
