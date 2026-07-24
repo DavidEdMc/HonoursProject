@@ -1,4 +1,5 @@
-@model HonoursProject.Models.User
+@model HonoursProject.Models.ProfileViewModel
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Your Profile";
@@ -17,6 +18,11 @@
         <div class="profile-info">
             <h1 class="profile-name">@Model.Username</h1>
             <p class="profile-email">@Model.EmailAddress</p>
+            <p class="level-badge">Level @Model.Level</p>
+            <div class="xp-bar">
+                <div class="xp-fill" style="width:@((Model.CurrentXp * 100) / (Model.Level * 100))%;"></div>
+            </div>
+            <p>XP to next level: <strong>@Model.XpToNextLevel</strong></p>
         </div>
     </div>
 
@@ -25,9 +31,9 @@
 
     <div class="profile-section">
         <h2>Progress Overview</h2>
-        <p>Lessons Completed: <strong>0</strong></p>
-        <p>Badges Earned: <strong>0</strong></p>
-        <p>Current Streak: <strong>0 days</strong></p>
+        <p>Lessons Completed: <strong>@Model.LessonsCompleted</strong></p>
+        <p>Badges Earned: <strong>@Model.AchievementsEarned</strong></p>
+        <p>Current Streak: <strong>@Model.DayStreak days</strong></p>
     </div>
 
     <hr />

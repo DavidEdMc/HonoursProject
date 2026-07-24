@@ -555,5 +555,23 @@ namespace HonoursProject.Services
 
             return Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
+
+        public async Task<int> GetUserXpAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            string query = @"
+                SELECT xp
+                FROM tb_user_xp
+                WHERE user_id = @u;
+            ";
+
+            var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            object result = await cmd.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt32(result) : 0;
+        }
     }
 }

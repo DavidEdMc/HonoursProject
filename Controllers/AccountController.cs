@@ -7,11 +7,13 @@ public class AccountController : Controller
 {
     private readonly UserService _userService;
     private readonly AchievementService _achievementService;
+    private readonly LessonService _lessonService;
 
-    public AccountController(UserService userService, AchievementService achievementService)
+    public AccountController(UserService userService, AchievementService achievementService, LessonService lessonService)
     {
         _userService = userService;
         _achievementService = achievementService;
+        _lessonService = lessonService;
     }
 
     public IActionResult LoginPage()
@@ -106,17 +108,37 @@ public class AccountController : Controller
         return View();
     }
 
-    public IActionResult ProfilePage()
+    public async Task<IActionResult> ProfilePage()
     {
         var username = HttpContext.Session.GetString("username");
+        var userId = HttpContext.Session.GetInt32("user_id");
 
-        if (username == null)
-        {
-            return RedirectToAction("LoginPage");
-        }
+        if (username == null || userId == null)
+            return RedirectToAction("LoginPage", "Account");
 
         var user = _userService.GetUserByUsername(username);
-        return View(user);
+
+        int xp = await _lessonService.GetUserXpAsync(userId.Value);
+        int level = await _lessonService.GetUserLevelAsync(userId.Value);
+
+        int xpToNextLevel = (level * 100) - xp; // matches your existing formula
+
+        var model = new ProfileViewModel
+        {
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            ProfilePicture = user.ProfilePicture,
+
+            LessonsCompleted = await _lessonService.GetTotalLessonsCompletedAsync(userId.Value),
+            AchievementsEarned = await _achievementService.GetUserAchievementCount(userId.Value),
+            DayStreak = await _lessonService.GetUserStreakAsync(userId.Value),
+
+            CurrentXp = xp,
+            Level = level,
+            XpToNextLevel = xpToNextLevel
+        };
+
+        return View(model);
     }
 
     public IActionResult AchievementsPage()
