@@ -10,6 +10,18 @@
     <h1 class="dashboard-title">Welcome back, @Model.Username</h1>
     <p class="dashboard-subtitle">Here’s your learning overview</p>
 
+    <!-- Current Level and XP -->
+    @await Html.PartialAsync("_Card", new CardViewModel {
+        Variant = "app-card-stat",
+        Content = new HtmlString($@"
+            <div class='stat-value'>Level {Model.Level}</div>
+            <div class='xp-bar'>
+                <div class='xp-fill' style='width:{(Model.CurrentXp * 100) / (Model.Level * 100)}%;'></div>
+            </div>
+            <div class='stat-label'>XP to next level: {Model.XpToNextLevel}</div>
+        ")
+    })
+
     <!-- Grid Layout -->
     <div class="dashboard-grid">
 

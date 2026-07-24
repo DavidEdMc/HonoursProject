@@ -22,6 +22,12 @@ public class DashboardController : Controller
     {
         var username = HttpContext.Session.GetString("username");
         var userId = HttpContext.Session.GetInt32("user_id");
+        var (xp, level) = (
+            await _lessonService.GetUserXpAsync(userId.Value),
+            await _lessonService.GetUserLevelAsync(userId.Value)
+        );
+
+        int xpToNextLevel = (level * 100) - xp;
 
         if (username == null || userId == null)
             return RedirectToAction("LoginPage", "Account");
@@ -32,11 +38,12 @@ public class DashboardController : Controller
             LessonsCompleted = await _lessonService.GetTotalLessonsCompletedAsync(userId.Value),
             AchievementsEarned = await _achievementService.GetUserAchievementCount(userId.Value),
             DayStreak = await _lessonService.GetUserStreakAsync(userId.Value),
-            Leaderboard = _userService.GetLeaderboard()
+            Leaderboard = _userService.GetLeaderboard(),
+            CurrentXp = xp,
+            Level = level,
+            XpToNextLevel = xpToNextLevel
         };
 
         return View(model);
     }
-
-
 }

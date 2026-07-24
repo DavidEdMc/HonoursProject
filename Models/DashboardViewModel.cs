@@ -7,5 +7,8 @@ namespace HonoursProject.Models
         public int AchievementsEarned { get; set; }
         public int DayStreak { get; set; }
         public List<LeaderboardEntry> Leaderboard { get; set; }
+        public int CurrentXp { get; set; }
+        public int Level { get; set; }
+        public int XpToNextLevel { get; set; }
     }
 }
