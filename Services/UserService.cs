@@ -240,9 +240,16 @@ namespace HonoursProject.Services
         public List<LeaderboardEntry> GetLeaderboard()
         {
             string query = @"
-                SELECT u.username, s.score, s.lessons_completed, s.highest_streak, s.fastest_lesson_seconds
+                SELECT 
+                    u.username,
+                    s.score,
+                    s.lessons_completed,
+                    s.highest_streak,
+                    s.fastest_lesson_seconds,
+                    xp.level
                 FROM tb_user_stats s
                 JOIN tb_users u ON u.id = s.user_id
+                JOIN tb_user_xp xp ON xp.user_id = u.id
                 ORDER BY s.score DESC
                 LIMIT 10;
             ";
@@ -265,7 +272,8 @@ namespace HonoursProject.Services
                             HighestStreak = reader.GetInt32("highest_streak"),
                             FastestLessonSeconds = reader.IsDBNull(reader.GetOrdinal("fastest_lesson_seconds"))
                                 ? 0
-                                : reader.GetInt32("fastest_lesson_seconds")
+                                : reader.GetInt32("fastest_lesson_seconds"),
+                            Level = reader.GetInt32("level")
                         });
                     }
                 }

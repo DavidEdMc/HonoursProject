@@ -7,5 +7,6 @@ namespace HonoursProject.Models
         public int LessonsCompleted { get; set; }
         public int HighestStreak { get; set; }
         public int FastestLessonSeconds { get; set; }
+        public int Level { get; set; }
     }
 }

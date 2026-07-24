@@ -21,6 +21,7 @@
             <tr>
                 <th data-sort="rank">#</th>
                 <th data-sort="username">User</th>
+                <th data-sort="level">Level</th>
                 <th data-sort="score">Score</th>
                 <th data-sort="lessons">Lessons</th>
                 <th data-sort="streak">Streak</th>
@@ -31,13 +32,17 @@
         <tbody>
             @{
                 var rank = 1;
+                var currentUser = Context.Session.GetString("username");
             }
 
             @foreach (var entry in Model)
             {
-                <tr>
+                bool isSelf = entry.Username == currentUser;
+
+                <tr class="@(isSelf ? "leaderboard-self" : "")">
                     <td>@rank</td>
                     <td>@entry.Username</td>
+                    <td>@entry.Level</td>
                     <td>@entry.Score</td>
                     <td>@entry.LessonsCompleted</td>
                     <td>@entry.HighestStreak days</td>
