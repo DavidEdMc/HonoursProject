@@ -305,11 +305,13 @@ function validateMCQ() {
 
     if (selectedOptionIsCorrect) {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
+        playCorrectSound();
         clickedBtn.classList.add('correct');
 
         recordAnswer(true);
     } else {
         feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
+        playIncorrectSound();
         clickedBtn.classList.add('incorrect');
 
         recordAnswer(false);
@@ -371,6 +373,7 @@ function validateSpotError() {
         feedback.innerHTML = "<span class='correct'>Correct — all incorrect statements were selected.</span>";
         selectedOptionIsCorrect = true;
 
+        playCorrectSound();
         // Correct case — pick ANY correct option ID
         const firstIncorrect = q.Options.find(o => !o.is_correct);
         selectedOptionId = firstIncorrect.id;
@@ -379,7 +382,8 @@ function validateSpotError() {
     } else {
         feedback.innerHTML = "<span class='incorrect'>You must select ALL incorrect statements and no correct ones.</span>";
         selectedOptionIsCorrect = false;
-
+        
+        playIncorrectSound();
         // Incorrect case — fallback ID
         selectedOptionId = q.Options[0].id;
 
@@ -419,6 +423,7 @@ function validateOrdering() {
         feedback.innerHTML = "<span class='correct'>Correct order!</span>";
         selectedOptionIsCorrect = true;
 
+        playCorrectSound();
         // Correct case — any valid option ID
         selectedOptionId = q.Options[0].id;
 
@@ -427,6 +432,7 @@ function validateOrdering() {
         feedback.innerHTML = "<span class='incorrect'>Some items are in the wrong order.</span>";
         selectedOptionIsCorrect = false;
 
+        playIncorrectSound();
         // Incorrect case — fallback ID
         selectedOptionId = q.Options[0].id;
 
@@ -462,6 +468,7 @@ function validateFillBlank() {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
         input.classList.add("correct");
 
+        playCorrectSound();
         // Correct case
         selectedOptionIsCorrect = true;
         selectedOptionId = correctOption.id;
@@ -471,8 +478,8 @@ function validateFillBlank() {
         feedback.innerHTML = "<span class='incorrect'>Incorrect.</span>";
         input.classList.add("incorrect");
 
+        playIncorrectSound();
         selectedOptionIsCorrect = false;
-
         // Incorrect case — fallback ID
         selectedOptionId = q.Options[0].id;
 
@@ -519,7 +526,8 @@ function validateDragDropMatch() {
     if (allCorrect) {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
         selectedOptionIsCorrect = true;
-
+        
+        playCorrectSound();
         // Correct case — any valid option ID
         selectedOptionId = q.Options[0].id;
 
@@ -528,6 +536,7 @@ function validateDragDropMatch() {
         feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect.</span>";
         selectedOptionIsCorrect = false;
 
+        playIncorrectSound();
         // Incorrect case — fallback ID
         selectedOptionId = q.Options[0].id;
 
@@ -621,7 +630,8 @@ function nextQuestion() {
 function finishLesson() {
     const bar = document.getElementById("lessonProgressBar");
     const banner = document.getElementById("lessonCompleteBanner");
-
+    
+    playCompleteSound();
     bar.style.width = "100%";
     bar.style.animation = "progressPulse 0.8s ease-in-out 2";
     banner.classList.add("show");
@@ -718,6 +728,30 @@ function sendAttemptToServer() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
+}
+
+function playCorrectSound() {
+    const audio = document.getElementById("soundCorrect");
+    if (audio) {
+        audio.volume = isMuted ? 0 : lessonVolume;
+        audio.play();
+    }
+}
+
+function playIncorrectSound() {
+    const audio = document.getElementById("soundIncorrect");
+    if (audio) {
+        audio.volume = isMuted ? 0 : lessonVolume;
+        audio.play();
+    }
+}
+
+function playCompleteSound() {
+    const audio = document.getElementById("soundComplete");
+    if (audio) {
+        audio.volume = isMuted ? 0 : lessonVolume;
+        audio.play();
+    }
 }
 
 window.onload = () => {

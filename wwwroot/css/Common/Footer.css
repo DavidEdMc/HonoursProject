@@ -18,3 +18,66 @@ footer a {
 footer a:hover {
     color: var(--color-brand-secondary) !important;
 }
+
+.footer .volume-control {
+    float: right;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+#volumeSlider {
+    width: 120px;
+    vertical-align: middle;
+    appearance: none;
+    height: 6px;
+    border-radius: 5px;
+    outline: none;
+    background: linear-gradient(
+        to right,
+        var(--color-brand-secondary) 0%,
+        var(--color-brand-secondary) calc(var(--value) * 100%),
+        #ffffff calc(var(--value) * 100%),
+        #ffffff 100%
+    );
+}
+
+/* Thumb */
+#volumeSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--color-brand-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Firefox */
+#volumeSlider::-moz-range-progress {
+    background: var(--color-brand-secondary);
+}
+#volumeSlider::-moz-range-track {
+    background: #ffffff;
+}
+#volumeSlider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--color-brand-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translateY(-5px);
+}
+
+
+/* Disabled */
+#volumeSlider.slider-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.volume-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 8px;
+}
