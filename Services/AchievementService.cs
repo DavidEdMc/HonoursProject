@@ -136,6 +136,16 @@ namespace HonoursProject.Services
                                 ? requirement
                                 : 0;
                             break;
+                            
+                        case "first_try_correct_count":
+                            userMetricValue = await _lessonService.GetFirstTryCorrectCountAsync(userId);
+                            break;
+
+                        case "perfect_first_pass":
+                            lastLessonId = await _lessonService.GetLastCompletedLessonIdAsync(userId);
+                            bool perfect = await _lessonService.DidUserPerfectFirstPassAsync(userId, lastLessonId);
+                            userMetricValue = perfect ? 1 : 0;
+                            break;
 
                         default:
                             userMetricValue = 0;

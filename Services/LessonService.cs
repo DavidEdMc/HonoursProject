@@ -579,5 +579,45 @@ namespace HonoursProject.Services
             object result = await cmd.ExecuteScalarAsync();
             return result != null ? Convert.ToInt32(result) : 0;
         }
+
+        public async Task<int> GetFirstTryCorrectCountAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            var cmd = new MySqlCommand(@"
+                SELECT COUNT(*)
+                FROM tb_user_question_attempts
+                WHERE user_id = @u AND attempts = 1 AND is_correct = 1;
+            ", conn);
+
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
+        public async Task<bool> DidUserPerfectFirstPassAsync(int userId, int lessonId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            var cmd = new MySqlCommand(@"
+                SELECT COUNT(*)
+                FROM tb_user_question_attempts qa
+                JOIN tb_questions q ON qa.question_id = q.id
+                WHERE qa.user_id = @u
+                AND q.lesson_id = @l
+                AND qa.attempts = 1
+                AND qa.is_correct = 1;
+            ", conn);
+
+            cmd.Parameters.AddWithValue("@u", userId);
+            cmd.Parameters.AddWithValue("@l", lessonId);
+
+            int firstTryCorrect = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+            int totalQuestions = await GetTotalQuestionsForLessonAsync(lessonId);
+
+            return firstTryCorrect == totalQuestions;
+        }
     }
 }

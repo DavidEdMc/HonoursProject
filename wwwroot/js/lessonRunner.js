@@ -16,6 +16,10 @@ let hasSubmitted = false;
 let currentQuestionId = null;
 let attemptCount = 0;
 let currentLessonId = window.lessonData.lessonId ?? window.lessonData.id;
+let incorrectQuestions = [];
+let correctQuestions = [];
+let retryMode = false;
+
 
 function loadQuestion(index) {
     const q = questions[index];
@@ -143,8 +147,16 @@ function loadQuestion(index) {
     document.getElementById("nextBtn").style.display = "none";
 
     // Update header
-    document.querySelector("h2").textContent =
-        `Question ${index + 1} of ${totalQuestions}`;
+    const header = document.getElementById("questionHeader");
+
+    if (!retryMode) {
+        header.textContent = `Question ${index + 1} of ${totalQuestions}`;
+    } else {
+        const retryIndex = incorrectQuestions.indexOf(currentIndex) + 1;
+        const retryTotal = incorrectQuestions.length;
+
+        header.textContent = `Retry ${retryIndex} of ${retryTotal}`;
+    }
 
     updateProgressBar();
 }
@@ -287,7 +299,6 @@ function validateMCQ() {
 
     const clickedBtn = document.querySelector(`button[data-id="${selectedOptionId}"]`);
 
-    // Clear previous correctness styling
     document.querySelectorAll('.mcq-option').forEach(b => {
         b.classList.remove('correct', 'incorrect');
     });
@@ -296,16 +307,19 @@ function validateMCQ() {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
         clickedBtn.classList.add('correct');
 
-        sendAttemptToServer();
-
-        disableAllAnswers();
-        document.getElementById("nextBtn").style.display = "block";
-    }
-    else {
+        recordAnswer(true);
+    } else {
         feedback.innerHTML = "<span class='incorrect'>Incorrect!</span>";
         clickedBtn.classList.add('incorrect');
-        document.getElementById("nextBtn").style.display = "none";
+
+        recordAnswer(false);
     }
+
+    sendAttemptToServer();
+
+    disableAllAnswers();
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").style.display = "none";
 }
 
 function validateSpotError() {
@@ -355,19 +369,28 @@ function validateSpotError() {
 
     if (allSelectedAreCorrect && allCorrectAreSelected) {
         feedback.innerHTML = "<span class='correct'>Correct — all incorrect statements were selected.</span>";
+        selectedOptionIsCorrect = true;
 
+        // Correct case — pick ANY correct option ID
         const firstIncorrect = q.Options.find(o => !o.is_correct);
         selectedOptionId = firstIncorrect.id;
 
-        selectedOptionIsCorrect = true; 
-
-        sendAttemptToServer();
-        disableAllAnswers();
-        document.getElementById("nextBtn").style.display = "block";
+        recordAnswer(true);
     } else {
         feedback.innerHTML = "<span class='incorrect'>You must select ALL incorrect statements and no correct ones.</span>";
-        selectedOptionIsCorrect = false; 
+        selectedOptionIsCorrect = false;
+
+        // Incorrect case — fallback ID
+        selectedOptionId = q.Options[0].id;
+
+        recordAnswer(false);
     }
+
+    sendAttemptToServer();
+
+    disableAllAnswers();
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").style.display = "none";
 }
 
 function validateOrdering() {
@@ -394,17 +417,27 @@ function validateOrdering() {
 
     if (allCorrect) {
         feedback.innerHTML = "<span class='correct'>Correct order!</span>";
+        selectedOptionIsCorrect = true;
 
+        // Correct case — any valid option ID
         selectedOptionId = q.Options[0].id;
-        selectedOptionIsCorrect = true; 
 
-        sendAttemptToServer();
-        disableAllAnswers();
-        document.getElementById("nextBtn").style.display = "block";
+        recordAnswer(true);
     } else {
         feedback.innerHTML = "<span class='incorrect'>Some items are in the wrong order.</span>";
-        selectedOptionIsCorrect = false; 
+        selectedOptionIsCorrect = false;
+
+        // Incorrect case — fallback ID
+        selectedOptionId = q.Options[0].id;
+
+        recordAnswer(false);
     }
+
+    sendAttemptToServer();
+
+    disableAllAnswers();
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").style.display = "none";
 }
 
 function validateFillBlank() {
@@ -429,18 +462,28 @@ function validateFillBlank() {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
         input.classList.add("correct");
 
+        // Correct case
+        selectedOptionIsCorrect = true;
         selectedOptionId = correctOption.id;
-        selectedOptionIsCorrect = true; 
 
-        sendAttemptToServer();
-        disableAllAnswers();
-        document.getElementById("nextBtn").style.display = "block";
+        recordAnswer(true);
     } else {
-        feedback.innerHTML = "<span class='incorrect'>Incorrect. Try again.</span>";
+        feedback.innerHTML = "<span class='incorrect'>Incorrect.</span>";
         input.classList.add("incorrect");
 
-        selectedOptionIsCorrect = false; 
+        selectedOptionIsCorrect = false;
+
+        // Incorrect case — fallback ID
+        selectedOptionId = q.Options[0].id;
+
+        recordAnswer(false);
     }
+
+    sendAttemptToServer();
+
+    disableAllAnswers();
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").style.display = "none";
 }
 
 function validateDragDropMatch() {
@@ -451,7 +494,6 @@ function validateDragDropMatch() {
 
     let allCorrect = true;
 
-    // Check correctness
     q.Options.forEach(opt => {
         const correctKey = opt.match_key;
         const userKey = userMatches[correctKey];
@@ -461,7 +503,6 @@ function validateDragDropMatch() {
         }
     });
 
-    // Apply correct/incorrect colours to each drop zone
     document.querySelectorAll('.drop-zone').forEach(zone => {
         const expectedKey = zone.dataset.key;
         const userKey = userMatches[expectedKey];
@@ -477,44 +518,119 @@ function validateDragDropMatch() {
 
     if (allCorrect) {
         feedback.innerHTML = "<span class='correct'>Correct!</span>";
-
-        selectedOptionId = q.Options[0].id;
         selectedOptionIsCorrect = true;
 
-        sendAttemptToServer();
-        disableAllAnswers();
-        document.getElementById("nextBtn").style.display = "block";
-    }
-    else {
-        feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect.</span>";
+        // Correct case — any valid option ID
+        selectedOptionId = q.Options[0].id;
 
+        recordAnswer(true);
+    } else {
+        feedback.innerHTML = "<span class='incorrect'>Some matches are incorrect.</span>";
         selectedOptionIsCorrect = false;
+
+        // Incorrect case — fallback ID
+        selectedOptionId = q.Options[0].id;
+
+        recordAnswer(false);
     }
+
+    sendAttemptToServer();
+
+    disableAllAnswers();
+    document.getElementById("nextBtn").style.display = "block";
+    document.getElementById("submitBtn").style.display = "none";
 }
 
+function recordAnswer(isCorrect) {
+    if (!retryMode) {
+        // FIRST PASS
+        if (isCorrect) {
+            correctQuestions.push(currentIndex);
+        } else {
+            incorrectQuestions.push(currentIndex);
+        }
+    } else {
+        // RETRY MODE
+        if (isCorrect) {
+            incorrectQuestions = incorrectQuestions.filter(i => i !== currentIndex);
+            if (!correctQuestions.includes(currentIndex)) {
+                correctQuestions.push(currentIndex);
+            }
+        }
+    }
+}
 
 function nextQuestion() {
-    currentIndex++;
+    // Hide next button, show submit button again
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("submitBtn").style.display = "inline-block";
 
-    if (currentIndex < totalQuestions) {
-        // Load next question dynamically
-        loadQuestion(currentIndex);
-    } 
-    else {
-        // Completion animation
-        const bar = document.getElementById("lessonProgressBar");
-        const banner = document.getElementById("lessonCompleteBanner");
+    // -----------------------------
+    // FIRST PASS (retryMode == false)
+    // -----------------------------
+    if (!retryMode) {
 
-        bar.style.width = "100%";
-        bar.style.animation = "progressPulse 0.8s ease-in-out 2";
-        banner.classList.add("show");
+        currentIndex++;
 
-        // Redirect to Complete page
-        setTimeout(() => {
-            window.location.href = "/Lesson/Complete";
-        }, 1200);
+        // Still in first pass
+        if (currentIndex < totalQuestions) {
+            loadQuestion(currentIndex);
+            return;
+        }
+
+        // First pass finished → enter retry mode
+        retryMode = true;
+
+        // If there are incorrect questions, start retrying them
+        if (incorrectQuestions.length > 0) {
+            currentIndex = incorrectQuestions[0];
+            loadQuestion(currentIndex);
+            return;
+        }
+
+        // No incorrect questions → lesson complete
+        finishLesson();
+        return;
     }
+
+    // -----------------------------
+    // RETRY MODE (retryMode == true)
+    // -----------------------------
+    // Find current question's position in the incorrect list
+    const idx = incorrectQuestions.indexOf(currentIndex);
+
+    // Move to next incorrect question
+    if (idx !== -1 && idx + 1 < incorrectQuestions.length) {
+        currentIndex = incorrectQuestions[idx + 1];
+        loadQuestion(currentIndex);
+        return;
+    }
+
+    // End of incorrect list → check if any remain
+    if (incorrectQuestions.length > 0) {
+        // Loop back to start of incorrect list
+        currentIndex = incorrectQuestions[0];
+        loadQuestion(currentIndex);
+        return;
+    }
+
+    // All questions mastered → finish lesson
+    finishLesson();
 }
+
+function finishLesson() {
+    const bar = document.getElementById("lessonProgressBar");
+    const banner = document.getElementById("lessonCompleteBanner");
+
+    bar.style.width = "100%";
+    bar.style.animation = "progressPulse 0.8s ease-in-out 2";
+    banner.classList.add("show");
+
+    setTimeout(() => {
+        window.location.href = "/Lesson/Complete";
+    }, 1200);
+}
+
 
 function disableAllAnswers() {
     // MCQ
@@ -559,9 +675,22 @@ function disableAllAnswers() {
 }
 
 function updateProgressBar() {
-    const progress = ((currentIndex + 1) / totalQuestions) * 100;
-    document.getElementById("lessonProgressBar").style.width = progress + "%";
+    let percent;
+
+    if (!retryMode) {
+        // FIRST PASS — normal behaviour
+        percent = ((currentIndex + 1) / totalQuestions) * 100;
+    } else {
+        // RETRY MODE — progress based on incorrect questions
+        const retryIndex = incorrectQuestions.indexOf(currentIndex) + 1;
+        const retryTotal = incorrectQuestions.length;
+
+        percent = (retryIndex / retryTotal) * 100;
+    }
+
+    document.getElementById("lessonProgressBar").style.width = percent + "%";
 }
+
 
 updateProgressBar();
 
