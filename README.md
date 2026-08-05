@@ -14,6 +14,8 @@ To run HonoursProject without installing anything:
 
 The app will launch automatically in your browser.
 
+NOTE: As this is a university project, the exe file may be be flagged by features such as Windows Defender as an "unrecognized app" this is due to it simply being a prototype applicaiton and not an official exe release file that would be recognized. Please ignore this warning if it appears.
+
 # Project Abstract
 This project evaluates whether a gamified web-based learning environment improves student engagement and information retention compared with traditional materials. It implements a prototype application that uses selected game mechanics and compares outcomes from two matched participant groups (gamified vs. non-gamified) through periodic assessments. The repository contains the prototype source and architecture documentation.
 
