@@ -8,7 +8,7 @@ namespace HonoursProject.Services
 
         public DatabaseService(IConfiguration config)
         {
-            _connectionString = config.GetConnectionString("DefaultConnection");
+            _connectionString = Environment.GetEnvironmentVariable("DefaultConnection") ?? config.GetConnectionString("DefaultConnection");
         }
 
         public MySqlConnection GetConnection()
