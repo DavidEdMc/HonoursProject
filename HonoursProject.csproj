@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>WinExe</OutputType>
-    <ApplicationIcon>Assets/duck-minimalist.ico</ApplicationIcon>
+    <ApplicationIcon>wwwroot/assets/duck-minimalist.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
