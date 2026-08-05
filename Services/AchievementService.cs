@@ -57,7 +57,7 @@ namespace HonoursProject.Services
             return achievements;
         }
 
-        public async Task<List<AchievementViewModel>> UnlockAchievementsAsync(int userId, string category)
+        public async Task<List<AchievementViewModel>> UnlockAchievementsAsync(int userId, string category, int lessonId, int runId)
         {
             var unlocked = new List<AchievementViewModel>();
 
@@ -129,22 +129,31 @@ namespace HonoursProject.Services
 
                         case "perfect_score_on_lesson":
                             int lastLessonId = await _lessonService.GetLastCompletedLessonIdAsync(userId);
-                            int lastScore = await _lessonService.GetLastLessonScoreAsync(userId);
+                            int lastRunId = runId;
 
-                            // requirement_value = lessonId
-                            userMetricValue = (lastLessonId == requirement && lastScore == await _lessonService.GetTotalQuestionsForLessonAsync(requirement))
-                                ? requirement
-                                : 0;
-                            break;
-                            
-                        case "first_try_correct_count":
-                            userMetricValue = await _lessonService.GetFirstTryCorrectCountAsync(userId);
+                            if (lastLessonId == requirement)
+                            {
+                                int correct = _lessonService.CountCorrectAnswers(userId, lastLessonId, lastRunId);
+                                int incorrect = _lessonService.CountIncorrectAnswers(userId, lastLessonId, lastRunId);
+                                int total = await _lessonService.GetTotalQuestionsForLessonAsync(lastLessonId);
+
+                                userMetricValue = (correct == total && incorrect == 0) ? requirement : 0;
+                            }
                             break;
 
                         case "perfect_first_pass":
                             lastLessonId = await _lessonService.GetLastCompletedLessonIdAsync(userId);
-                            bool perfect = await _lessonService.DidUserPerfectFirstPassAsync(userId, lastLessonId);
-                            userMetricValue = perfect ? 1 : 0;
+                            lastRunId = runId;
+
+                            int c = _lessonService.CountCorrectAnswers(userId, lastLessonId, lastRunId);
+                            int ic = _lessonService.CountIncorrectAnswers(userId, lastLessonId, lastRunId);
+                            int tq = await _lessonService.GetTotalQuestionsForLessonAsync(lastLessonId);
+
+                            userMetricValue = (c == tq && ic == 0) ? 1 : 0;
+                            break;
+
+                        case "questions_correct":
+                            userMetricValue = await _lessonService.GetTotalCorrectAnswersAsync(userId);
                             break;
 
                         default:

@@ -208,6 +208,22 @@ namespace HonoursProject.Services
             }
         }
 
+        public async Task<int> GetTotalCorrectAnswersAsync(int userId)
+        {
+            using var conn = _db.GetConnection();
+            await conn.OpenAsync();
+
+            var cmd = new MySqlCommand(@"
+                SELECT COUNT(*)
+                FROM tb_user_question_attempts
+                WHERE user_id = @u AND is_correct = 1;
+            ", conn);
+
+            cmd.Parameters.AddWithValue("@u", userId);
+
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
+        }
+
         public int CountCorrectAnswers(int userId, int lessonId, int runId)
         {
             using (var conn = _db.GetConnection())

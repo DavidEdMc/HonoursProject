@@ -187,13 +187,14 @@ public class LessonController : Controller
 
         // 7. Achievements
         var unlocked = new List<AchievementViewModel>();
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "progression"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "lesson"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "engagement"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "performance"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "special"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "level"));
-        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "streak"));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "progression", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "lesson", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "engagement", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "performance", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "special", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "level", lessonId, runId));
+        unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "streak", lessonId, runId));
+
 
         ViewBag.UnlockedAchievements = unlocked;
 
