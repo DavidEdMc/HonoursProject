@@ -169,12 +169,19 @@ public class LessonController : Controller
         await _lessonService.SaveLessonHistory(userId.Value, lessonId, score, durationSeconds);
 
         // -----------------------------
-        // 4. Award XP
+        // 4. Award XP (Option B)
         // -----------------------------
-        int xp = score;
+        int correctCount = _lessonService.CountCorrectAnswers(userId.Value, lessonId);
+        int xp = 0;
 
-        if (durationSeconds < 60) xp += 25;   // speed bonus
-        if (durationSeconds < 30) xp += 50;  // lightning bonus
+        // XP for correct answers
+        xp += correctCount * 2;
+
+        // XP bonus for completing the lesson
+        xp += 10;
+
+        if (durationSeconds < 60) xp += 5;   // speed bonus
+        if (durationSeconds < 30) xp += 15;  // lightning bonus
 
         _lessonService.AddXp(userId.Value, xp);
 

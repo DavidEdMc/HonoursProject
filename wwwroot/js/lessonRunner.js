@@ -20,7 +20,6 @@ let incorrectQuestions = [];
 let correctQuestions = [];
 let retryMode = false;
 
-
 function loadQuestion(index) {
     const q = questions[index];
     currentQuestionId = q.id;
