@@ -197,10 +197,33 @@ public class LessonController : Controller
 
         ViewBag.UnlockedAchievements = unlocked;
 
-        // 8. View data
+        // 8. Accuracy + Mistakes
+        int totalQuestions = await _lessonService.GetTotalQuestionsForLessonAsync(lessonId);
+        int mistakes = incorrectCount;
+        int totalAttempts = correctCount + incorrectCount;
+
+        // avoid divide-by-zero
+        double accuracy = totalAttempts > 0 
+            ? (double)correctCount / totalAttempts * 100 
+            : 0;
+
+        // 9. XP Bar data
+        int currentXp = await _lessonService.GetUserXpAsync(userId.Value);
+        int level = await _lessonService.GetUserLevelAsync(userId.Value);
+        int xpToNextLevel = (level * 100) - currentXp;
+
+        // 10. View data
         ViewBag.Score = score;
         ViewBag.Xp = xp;
         ViewBag.Duration = durationSeconds;
+        ViewBag.Accuracy = accuracy;
+        ViewBag.Mistakes = mistakes;
+        ViewBag.TotalQuestions = totalQuestions;
+        ViewBag.CorrectCount = correctCount;
+        ViewBag.TotalAttempts = totalAttempts;
+        ViewBag.CurrentXp = currentXp;
+        ViewBag.Level = level;
+        ViewBag.XpToNextLevel = xpToNextLevel;
 
         return View();
     }

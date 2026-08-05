@@ -5,10 +5,28 @@
 <div class="lesson-page-container">
     <h1>Lesson Complete!</h1>
     <p>You’ve finished all questions for this lesson.</p>
+    <div class="xp-section">
+        <h3>Your XP Progress</h3>
+
+        <p>Level @ViewBag.Level</p>
+
+        <div class="xp-bar">
+            <div class="xp-fill" style="width:@((ViewBag.CurrentXp * 100) / (ViewBag.Level * 100))%;"></div>
+        </div>
+
+        <p>XP to next level: <strong>@ViewBag.XpToNextLevel</strong></p>
+    </div>
+
     <hr />
+
     <p>Score: @ViewBag.Score</p>
     <p>XP Earned: @ViewBag.Xp</p>
     <p>Time Taken: @ViewBag.Duration seconds</p>
+
+    <p>Questions Answered: @ViewBag.TotalQuestions</p>
+    <p>Mistakes Made: @ViewBag.Mistakes</p>
+    <p>Total Attempts: @ViewBag.TotalAttempts</p>
+    <p>Accuracy: @ViewBag.Accuracy.ToString("F1")%</p>
 
     <a class="btn btn-lesson" href="/Lesson/LessonSelectionPage">Back to Lessons</a>
 </div>
