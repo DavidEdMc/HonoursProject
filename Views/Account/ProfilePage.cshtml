@@ -31,8 +31,7 @@
 
     <div class="profile-section">
         <h2>Progress Overview</h2>
-        <p>Lessons Completed: <strong>@Model.LessonsCompleted</strong></p>
-        <p>Badges Earned: <strong>@Model.AchievementsEarned</strong></p>
+        <p>Total Lessons Completed: <strong>@Model.LessonsCompleted</strong></p>
         <p>Current Streak: <strong>@Model.DayStreak days</strong></p>
     </div>
 
@@ -41,7 +40,7 @@
     <div class="profile-section">
         <h2>Your Achievements</h2>
         <p>See your badges, streaks, and progress milestones.</p>
-
+        <p>Achievements Earned: <strong>@Model.AchievementsEarned</strong></p>
         <a class="btn" asp-controller="Account" asp-action="AchievementsPage" asp-route-from="profile">
             View Achievements →
         </a>
