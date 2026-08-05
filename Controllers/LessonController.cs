@@ -161,7 +161,23 @@ public class LessonController : Controller
         // -----------------------------
         // 2. Calculate score
         // -----------------------------
+        // set score (correct answers only)
         int score = _lessonService.CalculateLessonScore(userId.Value, lessonId);
+
+        // Count incorrect answers
+        int incorrectCount = _lessonService.CountIncorrectAnswers(userId.Value, lessonId);
+
+        // Apply penalty
+        score -= incorrectCount * 5;   // subtract 5 points per wrong answer
+
+        // Perfect run bonus
+        if (incorrectCount == 0)
+        {
+            score += 20;   // bonus for perfect run
+        }
+
+        // Prevent negative scores
+        if (score < 0) score = 0;
 
         // -----------------------------
         // 3. Save lesson history

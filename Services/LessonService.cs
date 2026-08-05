@@ -233,6 +233,32 @@ namespace HonoursProject.Services
             }
         }
 
+        public int CountIncorrectAnswers(int userId, int lessonId)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    SELECT COUNT(*)
+                    FROM tb_user_question_attempts a
+                    JOIN tb_questions q ON a.question_id = q.id
+                    WHERE a.user_id = @userId 
+                    AND q.lesson_id = @lessonId 
+                    AND a.is_correct = 0;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
+
+                    var result = cmd.ExecuteScalar();
+                    return result == DBNull.Value ? 0 : Convert.ToInt32(result);
+                }
+            }
+        }
+
         public int CalculateLessonScore(int userId, int lessonId)
         {
             using (var conn = _db.GetConnection())
