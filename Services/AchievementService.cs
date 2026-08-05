@@ -1,5 +1,5 @@
 using HonoursProject.Models;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace HonoursProject.Services
 {
