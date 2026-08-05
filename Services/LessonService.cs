@@ -180,7 +180,7 @@ namespace HonoursProject.Services
             return options;
         }
 
-        public void RecordQuestionAttempt(int userId, int lessonId, int questionId, int optionId, bool isCorrect, int timeTaken, int attempts)
+        public void RecordQuestionAttempt(int userId, int lessonId, int questionId, int optionId, bool isCorrect, int timeTaken, int attempts, int runId)
         {
             using (var conn = _db.GetConnection())
             {
@@ -188,8 +188,8 @@ namespace HonoursProject.Services
 
                 string query = @"
                     INSERT INTO tb_user_question_attempts
-                    (user_id, lesson_id, question_id, selected_option_id, is_correct, time_taken_seconds, attempts)
-                    VALUES (@userId, @lessonId, @questionId, @optionId, @isCorrect, @timeTaken, @attempts);
+                    (user_id, lesson_id, question_id, selected_option_id, is_correct, time_taken_seconds, attempts, run_id)
+                    VALUES (@userId, @lessonId, @questionId, @optionId, @isCorrect, @timeTaken, @attempts, @runId);
                 ";
 
                 using (var cmd = new MySqlCommand(query, conn))
@@ -201,13 +201,14 @@ namespace HonoursProject.Services
                     cmd.Parameters.AddWithValue("@isCorrect", isCorrect ? 1 : 0);
                     cmd.Parameters.AddWithValue("@timeTaken", timeTaken);
                     cmd.Parameters.AddWithValue("@attempts", attempts);
+                    cmd.Parameters.AddWithValue("@runId", runId);   // NEW
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public int CountCorrectAnswers(int userId, int lessonId)
+        public int CountCorrectAnswers(int userId, int lessonId, int runId)
         {
             using (var conn = _db.GetConnection())
             {
@@ -219,6 +220,7 @@ namespace HonoursProject.Services
                     JOIN tb_questions q ON a.question_id = q.id
                     WHERE a.user_id = @userId 
                     AND q.lesson_id = @lessonId 
+                    AND a.run_id = @runId
                     AND a.is_correct = 1;
                 ";
 
@@ -226,6 +228,7 @@ namespace HonoursProject.Services
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
                     cmd.Parameters.AddWithValue("@lessonId", lessonId);
+                    cmd.Parameters.AddWithValue("@runId", runId);
 
                     var result = cmd.ExecuteScalar();
                     return result == DBNull.Value ? 0 : Convert.ToInt32(result);
@@ -233,7 +236,7 @@ namespace HonoursProject.Services
             }
         }
 
-        public int CountIncorrectAnswers(int userId, int lessonId)
+        public int CountIncorrectAnswers(int userId, int lessonId, int runId)
         {
             using (var conn = _db.GetConnection())
             {
@@ -243,8 +246,9 @@ namespace HonoursProject.Services
                     SELECT COUNT(*)
                     FROM tb_user_question_attempts a
                     JOIN tb_questions q ON a.question_id = q.id
-                    WHERE a.user_id = @userId 
-                    AND q.lesson_id = @lessonId 
+                    WHERE a.user_id = @userId
+                    AND q.lesson_id = @lessonId
+                    AND a.run_id = @runId
                     AND a.is_correct = 0;
                 ";
 
@@ -252,6 +256,7 @@ namespace HonoursProject.Services
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
                     cmd.Parameters.AddWithValue("@lessonId", lessonId);
+                    cmd.Parameters.AddWithValue("@runId", runId);
 
                     var result = cmd.ExecuteScalar();
                     return result == DBNull.Value ? 0 : Convert.ToInt32(result);
@@ -259,7 +264,7 @@ namespace HonoursProject.Services
             }
         }
 
-        public int CalculateLessonScore(int userId, int lessonId)
+        public int CalculateLessonScore(int userId, int lessonId, int runId)
         {
             using (var conn = _db.GetConnection())
             {
@@ -269,7 +274,34 @@ namespace HonoursProject.Services
                     SELECT SUM(q.points)
                     FROM tb_user_question_attempts a
                     JOIN tb_questions q ON a.question_id = q.id
-                    WHERE a.user_id = @userId AND q.lesson_id = @lessonId AND a.is_correct = 1;
+                    WHERE a.user_id = @userId
+                    AND q.lesson_id = @lessonId
+                    AND a.run_id = @runId
+                    AND a.is_correct = 1;
+                ";
+
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+                    cmd.Parameters.AddWithValue("@lessonId", lessonId);
+                    cmd.Parameters.AddWithValue("@runId", runId);
+
+                    var result = cmd.ExecuteScalar();
+                    return result == DBNull.Value ? 0 : Convert.ToInt32(result);
+                }
+            }
+        }
+
+        public int CreateNewRun(int userId, int lessonId)
+        {
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                    INSERT INTO tb_user_lesson_runs (user_id, lesson_id, started_at)
+                    VALUES (@userId, @lessonId, NOW());
+                    SELECT LAST_INSERT_ID();
                 ";
 
                 using (var cmd = new MySqlCommand(query, conn))
@@ -277,8 +309,7 @@ namespace HonoursProject.Services
                     cmd.Parameters.AddWithValue("@userId", userId);
                     cmd.Parameters.AddWithValue("@lessonId", lessonId);
 
-                    var result = cmd.ExecuteScalar();
-                    return result == DBNull.Value ? 0 : Convert.ToInt32(result);
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }

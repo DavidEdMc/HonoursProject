@@ -108,14 +108,16 @@ public class LessonController : Controller
 
     public async Task<IActionResult> Start(int id, int index = 0)
     {
-        var username = HttpContext.Session.GetString("username");
-        if (username == null)
+        var userId = HttpContext.Session.GetInt32("user_id");
+        if (userId == null)
             return RedirectToAction("LoginPage", "Account");
         
         HttpContext.Session.SetString("LessonStartTime", DateTime.UtcNow.ToString());
         TempData["LessonId"] = id;
 
         var questions = await _lessonService.GetQuestionsForLessonAsync(id);
+        int runId = _lessonService.CreateNewRun(userId.Value, id);
+        HttpContext.Session.SetInt32("CurrentRunId", runId);
 
         if (index < 0 || index >= questions.Count)
             index = 0;
@@ -137,10 +139,8 @@ public class LessonController : Controller
         if (userId == null)
             return RedirectToAction("LoginPage", "Account");
 
-        // Retrieve start time
         var startString = HttpContext.Session.GetString("LessonStartTime");
 
-        // Retrieve lessonId from TempData
         var lessonIdString = TempData["LessonId"]?.ToString();
         if (!int.TryParse(lessonIdString, out int lessonId))
         {
@@ -148,9 +148,7 @@ public class LessonController : Controller
             return View();
         }
 
-        // -----------------------------
-        // 1. Calculate duration
-        // -----------------------------
+        // 1. Duration
         int durationSeconds = 0;
         if (DateTime.TryParse(startString, out var startTime))
         {
@@ -158,64 +156,37 @@ public class LessonController : Controller
             durationSeconds = (int)(endTime - startTime).TotalSeconds;
         }
 
-        // -----------------------------
-        // 2. Calculate score
-        // -----------------------------
-        // set score (correct answers only)
-        int score = _lessonService.CalculateLessonScore(userId.Value, lessonId);
+        // get runId
+        int runId = HttpContext.Session.GetInt32("CurrentRunId").Value;
 
-        // Count incorrect answers
-        int incorrectCount = _lessonService.CountIncorrectAnswers(userId.Value, lessonId);
+        // 2. Score (run-based)
+        int score = _lessonService.CalculateLessonScore(userId.Value, lessonId, runId);
+        int incorrectCount = _lessonService.CountIncorrectAnswers(userId.Value, lessonId, runId);
 
-        // Apply penalty
-        score -= incorrectCount * 5;   // subtract 5 points per wrong answer
-
-        // Perfect run bonus
-        if (incorrectCount == 0)
-        {
-            score += 20;   // bonus for perfect run
-        }
-
-        // Prevent negative scores
+        score -= incorrectCount * 5;
+        if (incorrectCount == 0) score += 20;
         if (score < 0) score = 0;
 
-        // -----------------------------
-        // 3. Save lesson history
-        // -----------------------------
+        // 3. Save history
         await _lessonService.SaveLessonHistory(userId.Value, lessonId, score, durationSeconds);
 
-        // -----------------------------
-        // 4. Award XP (Option B)
-        // -----------------------------
-        int correctCount = _lessonService.CountCorrectAnswers(userId.Value, lessonId);
-        int xp = 0;
+        // 4. XP (run-based)
+        int correctCount = _lessonService.CountCorrectAnswers(userId.Value, lessonId, runId);
+        int xp = correctCount * 2 + 10;
 
-        // XP for correct answers
-        xp += correctCount * 2;
-
-        // XP bonus for completing the lesson
-        xp += 10;
-
-        if (durationSeconds < 60) xp += 5;   // speed bonus
-        if (durationSeconds < 30) xp += 15;  // lightning bonus
+        if (durationSeconds < 60) xp += 5;
+        if (durationSeconds < 30) xp += 15;
 
         _lessonService.AddXp(userId.Value, xp);
 
-        // -----------------------------
-        // 5. Update leaderboard stats
-        // -----------------------------
+        // 5. Leaderboard
         _lessonService.UpdateUserStats(userId.Value, lessonId, score, durationSeconds);
 
-        // -----------------------------
         // 6. Cleanup
-        // -----------------------------
         HttpContext.Session.Remove("LessonStartTime");
 
-        // -----------------------------
-        // 7. Unlock achievements
-        // -----------------------------
+        // 7. Achievements
         var unlocked = new List<AchievementViewModel>();
-
         unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "progression"));
         unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "lesson"));
         unlocked.AddRange(await _achievementService.UnlockAchievementsAsync(userId.Value, "engagement"));
@@ -226,9 +197,7 @@ public class LessonController : Controller
 
         ViewBag.UnlockedAchievements = unlocked;
 
-        // -----------------------------
-        // 8. Pass data to the view
-        // -----------------------------
+        // 8. View data
         ViewBag.Score = score;
         ViewBag.Xp = xp;
         ViewBag.Duration = durationSeconds;
@@ -245,6 +214,12 @@ public class LessonController : Controller
             if (userId == null)
                 return Unauthorized();
 
+            // NEW: get runId from session
+            var runId = HttpContext.Session.GetInt32("CurrentRunId");
+            if (runId == null)
+                return StatusCode(500, "Run ID missing from session.");
+
+            // UPDATED: pass runId into service
             _lessonService.RecordQuestionAttempt(
                 userId.Value,
                 attempt.LessonId,
@@ -252,7 +227,8 @@ public class LessonController : Controller
                 attempt.OptionId ?? 0,
                 attempt.IsCorrect,
                 attempt.TimeTakenSeconds,
-                attempt.Attempts
+                attempt.Attempts,
+                runId.Value   // NEW
             );
 
             return Ok();
