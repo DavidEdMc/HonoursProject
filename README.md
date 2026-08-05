@@ -2,6 +2,18 @@
 # Project: HonoursProject
 The following project is part of my **2026 Honours Project** for the **BSC (HONS) SOFTWARE DEVELOPMENT (GRADUATE APPRENTICESHIP)** programme at **Edinburgh Napier University**.
 
+## Running the Application
+
+To run HonoursProject without installing anything:
+
+1. Go to the Releases page.
+2. Download the latest ZIP file.
+3. Extract it.
+4. Open the "publish" folder.
+5. Run HonoursProject.exe.
+
+The app will launch automatically in your browser.
+
 # Project Abstract
 This project evaluates whether a gamified web-based learning environment improves student engagement and information retention compared with traditional materials. It implements a prototype application that uses selected game mechanics and compares outcomes from two matched participant groups (gamified vs. non-gamified) through periodic assessments. The repository contains the prototype source and architecture documentation.
 
