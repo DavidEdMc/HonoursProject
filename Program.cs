@@ -1,5 +1,6 @@
 using HonoursProject.Services;
-using Microsoft.AspNetCore.Mvc; // Needed for filter options
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// Force the app to run on localhost:5000
+app.Urls.Add("http://localhost:5000");
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -31,7 +35,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseSession();   // this is correct
+app.UseSession();
 
 app.UseAuthorization();
 
@@ -40,5 +44,19 @@ app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=LoginPage}/{id?}");
+
+// Automatically open the browser when the EXE starts
+try
+{
+    Process.Start(new ProcessStartInfo
+    {
+        FileName = "http://localhost:5000",
+        UseShellExecute = true
+    });
+}
+catch
+{
+    // Ignore failures
+}
 
 app.Run();
