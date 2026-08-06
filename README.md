@@ -14,6 +14,8 @@ To run HonoursProject without installing anything:
 
 The app will launch automatically in your browser.
 
+Your first launch of the application will require you to register an account via the login/registration form options, complete the registration and then log in to your personal session of the application using the created credentials. NOTE: All passwords are securely stored and are not visible on the Database
+
 NOTE: As this is a university project, the exe file may be be flagged by features such as Windows Defender as an "unrecognized app" this is due to it simply being a prototype applicaiton and not an official exe release file that would be recognized. Please ignore this warning if it appears.
 
 # Project Abstract
